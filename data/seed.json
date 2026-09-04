@@ -1,0 +1,252 @@
+{
+  "generatedFrom": [
+    "KB5 个体商户经营数据采集表(18家授权商户)",
+    "KB1 高德API原始POI清单",
+    "KB1 西安商业空间清单(真实)"
+  ],
+  "dataDeadline": "2026-08-31",
+  "defaultStore": "魏世纪 Hey wego·Bistro",
+  "defaultDistrict": "粉象Park",
+  "districts": [
+    {
+      "id": "粉象Park",
+      "name": "粉象Park",
+      "region": "碑林区",
+      "stores": 11,
+      "restaurantPoi": 20,
+      "coffeePoi": 20,
+      "subwayPoi": 7,
+      "comment": "钟楼商圈城市更新创意街区，KB 收录授权商户最多，咖啡店密度极高"
+    },
+    {
+      "id": "老钢厂",
+      "name": "老钢厂",
+      "region": "新城区",
+      "stores": 3,
+      "restaurantPoi": 6,
+      "coffeePoi": 8,
+      "subwayPoi": 5,
+      "comment": "建工路片区工业遗存创意产业园，文创与咖啡业态集聚"
+    },
+    {
+      "id": "西仓集市",
+      "name": "西仓集市",
+      "region": "莲湖区",
+      "stores": 2,
+      "restaurantPoi": 10,
+      "coffeePoi": 10,
+      "subwayPoi": 7,
+      "comment": "北院门片区传统集市，市井小吃与茶饮为主"
+    },
+    {
+      "id": "大雁塔",
+      "name": "大雁塔",
+      "region": "雁塔区",
+      "stores": 2,
+      "restaurantPoi": 10,
+      "coffeePoi": 10,
+      "subwayPoi": 3,
+      "comment": "大雁塔商圈文旅街区，旅游客群驱动的餐饮消费"
+    }
+  ],
+  "stores": [
+    {
+      "id": "store-01",
+      "name": "粉象Share",
+      "industry": "餐饮",
+      "district": "粉象Park",
+      "area": "180㎡",
+      "openedAt": "2026-01-15",
+      "monthlyRevenue": "22.8万",
+      "months": 8,
+      "current": false
+    },
+    {
+      "id": "store-02",
+      "name": "西安面馆",
+      "industry": "餐饮",
+      "district": "粉象Park",
+      "area": "120㎡",
+      "openedAt": "2025-11-10",
+      "monthlyRevenue": "15.0万",
+      "months": 10,
+      "current": false
+    },
+    {
+      "id": "store-03",
+      "name": "城市咖啡",
+      "industry": "咖啡",
+      "district": "粉象Park",
+      "area": "90㎡",
+      "openedAt": "2025-09-20",
+      "monthlyRevenue": "13.3万",
+      "months": 12,
+      "current": true
+    },
+    {
+      "id": "store-04",
+      "name": "魏世纪 Hey wego·Bistro",
+      "industry": "音乐餐酒吧",
+      "district": "粉象Park",
+      "area": "240㎡",
+      "openedAt": "2025-08前(已营业,真实商户)",
+      "monthlyRevenue": "25.2万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-05",
+      "name": "西塔老太太泥炉烤肉(粉象公园店)",
+      "industry": "泥炉烤肉",
+      "district": "粉象Park",
+      "area": "300㎡",
+      "openedAt": "2024-12(Trip.com实测:2024年12月西安首店落地粉象share)",
+      "monthlyRevenue": "32.5万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-06",
+      "name": "你又瘦了小酒馆(西安店)",
+      "industry": "中式小酒馆",
+      "district": "粉象Park",
+      "area": "150㎡",
+      "openedAt": "2025-08前(已营业,真实商户)",
+      "monthlyRevenue": "17.1万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-07",
+      "name": "Manner Coffee(粉巷店)",
+      "industry": "精品咖啡",
+      "district": "粉象Park",
+      "area": "60㎡",
+      "openedAt": "2025-08前(已营业,真实商户)",
+      "monthlyRevenue": "17.6万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-08",
+      "name": "达美乐比萨(西安粉巷店)",
+      "industry": "西式快餐(外卖)",
+      "district": "粉象Park",
+      "area": "90㎡",
+      "openedAt": "2025-01-20(天眼查工商注册:达美乐比萨(西安)有限公司粉巷店成立日期)",
+      "monthlyRevenue": "21.2万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-09",
+      "name": "丸山桌球俱乐部(粉巷店)",
+      "industry": "桌球娱乐",
+      "district": "粉象Park",
+      "area": "400㎡",
+      "openedAt": "2025-08前(已营业,真实商户)",
+      "monthlyRevenue": "13.6万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-10",
+      "name": "老钢厂咖啡",
+      "industry": "咖啡",
+      "district": "老钢厂",
+      "area": "100㎡",
+      "openedAt": "2025-06-01",
+      "monthlyRevenue": "9.6万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-11",
+      "name": "工业风餐吧",
+      "industry": "餐饮",
+      "district": "老钢厂",
+      "area": "220㎡",
+      "openedAt": "2025-08-18",
+      "monthlyRevenue": "17.4万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-12",
+      "name": "创意书店",
+      "industry": "文创",
+      "district": "老钢厂",
+      "area": "260㎡",
+      "openedAt": "2024-05-12",
+      "monthlyRevenue": "8.3万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-13",
+      "name": "西仓小吃",
+      "industry": "餐饮",
+      "district": "西仓集市",
+      "area": "60㎡",
+      "openedAt": "2025-03-05",
+      "monthlyRevenue": "12.0万",
+      "months": 9,
+      "current": false
+    },
+    {
+      "id": "store-14",
+      "name": "巷口茶饮",
+      "industry": "茶饮",
+      "district": "西仓集市",
+      "area": "35㎡",
+      "openedAt": "2025-07-01",
+      "monthlyRevenue": "11.4万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-15",
+      "name": "大雁塔轻食",
+      "industry": "餐饮",
+      "district": "大雁塔",
+      "area": "110㎡",
+      "openedAt": "2025-10-15",
+      "monthlyRevenue": "28.0万",
+      "months": 11,
+      "current": false
+    },
+    {
+      "id": "store-16",
+      "name": "城市文创店",
+      "industry": "文创",
+      "district": "大雁塔",
+      "area": "80㎡",
+      "openedAt": "2025-04-20",
+      "monthlyRevenue": "20.3万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-17",
+      "name": "米卡东方酒店(西安回民街钟楼地铁站店)",
+      "industry": "酒店住宿",
+      "district": "粉象Park",
+      "area": "2400㎡",
+      "openedAt": "2025-08前(已营业,真实商户)",
+      "monthlyRevenue": "168.4万",
+      "months": 12,
+      "current": false
+    },
+    {
+      "id": "store-18",
+      "name": "星程酒店(西安钟鼓楼南门店)",
+      "industry": "酒店住宿",
+      "district": "粉象Park",
+      "area": "2800㎡",
+      "openedAt": "2025-08前(已营业,真实商户)",
+      "monthlyRevenue": "117.0万",
+      "months": 12,
+      "current": false
+    }
+  ]
+}

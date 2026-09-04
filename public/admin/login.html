@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 · 数据资产后台管理系统</title>
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body class="al-body">
+  <div class="al-split">
+    <aside class="al-brand">
+      <div class="al-brand-inner">
+        <div class="al-brand-head">
+          <img src="/assets/logo.jpg" alt="New Retail Insight">
+          <div>
+            <div class="al-brand-name">数据资产后台管理系统</div>
+            <div class="al-brand-sub">ADMIN CONSOLE</div>
+          </div>
+        </div>
+        <p class="al-claim">与智慧门店运营洞察平台同源同账：<br>前台读账诊断，后台管账运维。</p>
+        <ul class="al-feats">
+          <li>
+            <span class="al-feat-num">01</span>
+            <div class="al-feat-body"><b>数据资产台账</b><span>五大板块统一建档，来源、周期、量级逐项可溯</span></div>
+          </li>
+          <li>
+            <span class="al-feat-num">02</span>
+            <div class="al-feat-body"><b>商圈与门店档案</b><span>4 大商圈 18 家门店，支持批量导入与导出台账</span></div>
+          </li>
+          <li>
+            <span class="al-feat-num">03</span>
+            <div class="al-feat-body"><b>角色权限管控</b><span>管理员 / 运营人员 / 只读人员，按岗授权</span></div>
+          </li>
+        </ul>
+        <div class="al-brand-foot">西安 · 线下商业数据资产运维</div>
+      </div>
+    </aside>
+
+    <main class="al-panel">
+      <div class="al-card">
+        <div class="al-card-brand">
+          <img src="/assets/logo.jpg" alt="New Retail Insight">
+          <h1 class="al-card-title">数据资产后台管理系统</h1>
+        </div>
+
+        <div class="al-notice" id="al-notice" hidden></div>
+
+        <form id="al-form" autocomplete="off">
+          <label class="al-label" for="username">账号</label>
+          <input class="al-input" id="username" name="username" type="text" maxlength="20" required>
+          <label class="al-label" for="password">密码</label>
+          <input class="al-input" id="password" name="password" type="password" maxlength="20" required>
+          <div class="al-error" id="al-error" hidden></div>
+          <button class="btn btn-primary al-submit" id="al-submit" type="submit">登录后台</button>
+        </form>
+        <a class="al-back" href="/">← 返回智慧门店运营洞察平台</a>
+      </div>
+    </main>
+  </div>
+  <script src="/admin/admin-login.js"></script>
+</body>
+</html>

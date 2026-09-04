@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 · 智慧门店运营洞察平台</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles-ext.css">
+</head>
+<body class="login-body">
+  <div class="login-split">
+    <aside class="login-brand">
+      <div class="brand-inner">
+        <div class="brand-head">
+          <img class="brand-seal" src="assets/logo.jpg" alt="New Retail Insight">
+          <div class="brand-name">智慧门店运营洞察平台</div>
+        </div>
+        <p class="brand-claim">把 18 家真实门店的一整年经营，<br>读成一页能决策的账。</p>
+        <ul class="brand-feats">
+          <li>
+            <span class="feat-num">01</span>
+            <div class="feat-body"><b>四维经营体检</b><span>健康度 · 客群 · 满意度 · 增长，逐月可追</span></div>
+          </li>
+          <li>
+            <span class="feat-num">02</span>
+            <div class="feat-body"><b>真实评价深潜</b><span>小红书 · 抖音 · 大众点评语料逐条统计</span></div>
+          </li>
+          <li>
+            <span class="feat-num">03</span>
+            <div class="feat-body"><b>问题到行动</b><span>按优先级排序，建议落到具体动作</span></div>
+          </li>
+        </ul>
+        <div class="brand-foot">西安 · 线下商业经营诊断</div>
+      </div>
+    </aside>
+
+    <main class="login-panel">
+      <div class="login-card">
+        <div class="login-card-brand">
+          <img class="login-seal" src="assets/logo.jpg" alt="New Retail Insight">
+          <h1 class="login-title">智慧门店运营洞察平台</h1>
+        </div>
+
+        <div class="login-notice" id="login-notice" hidden></div>
+
+        <div class="login-tabs" role="tablist">
+          <button class="login-tab active" id="tab-login" type="button">登录</button>
+          <button class="login-tab" id="tab-register" type="button">注册</button>
+        </div>
+
+        <form id="auth-form" autocomplete="off">
+          <label class="login-label" for="username">用户名</label>
+          <input class="login-input" id="username" name="username" type="text"
+                 placeholder="4-20 位字母、数字或下划线" maxlength="20" required>
+          <label class="login-label" for="password">密码</label>
+          <input class="login-input" id="password" name="password" type="password"
+                 placeholder="6-20 位" maxlength="20" required>
+          <div class="login-error" id="auth-error" hidden></div>
+          <button class="btn-primary login-submit" id="auth-submit" type="submit">登录</button>
+        </form>
+      </div>
+    </main>
+  </div>
+  <script src="auth.js"></script>
+</body>
+</html>

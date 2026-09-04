@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据资产后台管理系统</title>
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="admin-side">
+      <div class="side-brand">
+        <img src="/assets/logo.jpg" alt="New Retail Insight">
+        <div>
+          <div class="side-brand-name">数据资产后台管理</div>
+          <div class="side-brand-sub">ADMIN CONSOLE</div>
+        </div>
+      </div>
+      <nav class="side-nav" id="side-nav">
+        <a class="side-nav-item" data-view="users" data-min-role="admin"><span class="nav-ico">◉</span>用户管理</a>
+        <a class="side-nav-item" data-view="assets"><span class="nav-ico">▤</span>数据资产管理</a>
+        <a class="side-nav-item" data-view="districts"><span class="nav-ico">◈</span>商圈管理</a>
+        <a class="side-nav-item" data-view="stores"><span class="nav-ico">▦</span>门店管理</a>
+      </nav>
+      <div class="side-foot">
+        智慧门店运营洞察平台 · 左膀右臂
+        <a href="/" target="_blank">打开前台主站 ↗</a>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div class="topbar-title" id="topbar-title">数据资产管理</div>
+        <div class="topbar-user">
+          <div class="user-chip">
+            <div class="user-avatar" id="user-avatar">·</div>
+            <span class="user-name" id="user-name">-</span>
+            <span class="tag tag-viewer" id="user-role">-</span>
+          </div>
+          <button class="link-btn" id="btn-guide" type="button">使用说明</button>
+          <button class="link-btn" id="btn-logout">退出登录</button>
+        </div>
+      </div>
+
+      <!-- 模块1:用户管理(仅管理员可见) -->
+      <section class="view" id="view-users">
+        <div class="toolbar">
+          <input class="tb-input" id="users-q" placeholder="账号 / 姓名 / 手机号">
+          <select class="tb-select" id="users-role">
+            <option value="">全部角色</option>
+            <option value="admin">管理员</option>
+            <option value="operator">运营人员</option>
+            <option value="viewer">只读人员</option>
+          </select>
+          <select class="tb-select" id="users-status">
+            <option value="">全部状态</option>
+            <option value="enabled">启用</option>
+            <option value="disabled">禁用</option>
+          </select>
+          <button class="btn" id="users-search">查询</button>
+          <div class="spacer"></div>
+          <button class="btn btn-primary" id="users-add">+ 新增用户</button>
+        </div>
+        <div class="table-card">
+          <div id="users-table"></div>
+          <div class="pager" id="users-pager"></div>
+        </div>
+      </section>
+
+      <!-- 模块2:数据资产管理 -->
+      <section class="view" id="view-assets">
+        <div class="toolbar">
+          <input class="tb-input" id="assets-q" placeholder="资产名称 / 来源 / 负责人">
+          <select class="tb-select" id="assets-board"><option value="">全部板块</option></select>
+          <select class="tb-select" id="assets-status">
+            <option value="">全部状态</option>
+            <option value="active">在册</option>
+            <option value="archived">已归档</option>
+          </select>
+          <button class="btn" id="assets-search">查询</button>
+          <div class="spacer"></div>
+          <button class="btn" id="assets-boards">板块设置</button>
+          <button class="btn" id="assets-export">导出台账</button>
+          <button class="btn btn-primary" id="assets-add">+ 新增资产</button>
+        </div>
+        <div class="table-card">
+          <div id="assets-table"></div>
+          <div class="pager" id="assets-pager"></div>
+        </div>
+      </section>
+
+      <!-- 模块3:商圈管理 -->
+      <section class="view" id="view-districts">
+        <div class="toolbar">
+          <input class="tb-input" id="districts-q" placeholder="商圈名称 / 行政区 / 标签">
+          <button class="btn" id="districts-search">查询</button>
+          <div class="spacer"></div>
+          <button class="btn" id="districts-import">批量导入</button>
+          <button class="btn" id="districts-export">导出</button>
+          <button class="btn btn-primary" id="districts-add">+ 新增商圈</button>
+        </div>
+        <div class="table-card">
+          <div id="districts-table"></div>
+          <div class="pager" id="districts-pager"></div>
+        </div>
+      </section>
+
+      <!-- 模块4:门店管理 -->
+      <section class="view" id="view-stores">
+        <div class="toolbar">
+          <input class="tb-input" id="stores-q" placeholder="门店名称 / 业态 / 地址">
+          <select class="tb-select" id="stores-district"><option value="">全部商圈</option></select>
+          <select class="tb-select" id="stores-status">
+            <option value="">全部状态</option>
+            <option value="营业中">营业中</option>
+            <option value="筹备中">筹备中</option>
+            <option value="已停业">已停业</option>
+          </select>
+          <button class="btn" id="stores-search">查询</button>
+          <div class="spacer"></div>
+          <button class="btn" id="stores-import">批量导入</button>
+          <button class="btn" id="stores-export">导出</button>
+          <button class="btn btn-primary" id="stores-add">+ 新增门店</button>
+        </div>
+        <div class="table-card">
+          <div id="stores-table"></div>
+          <div class="pager" id="stores-pager"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 通用弹窗 -->
+  <div class="mask" id="mask" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h3 class="modal-title" id="modal-title"></h3>
+        <button class="modal-close" id="modal-close">×</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-foot" id="modal-foot"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

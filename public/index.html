@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智慧门店运营洞察平台</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles-ext.css">
+</head>
+<body>
+  <div class="app">
+    <!-- ===== 左侧边栏：长卷签条导航（scroll-spy 跟随） ===== -->
+    <aside class="sidebar">
+      <div class="logo">
+        <img class="logo-icon" src="assets/logo.jpg" alt="New Retail Insight">
+        <div class="logo-text">
+          <h1>智慧门店运营洞察平台</h1>
+          <p>Smart Store Insight Platform</p>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">当前门店</div>
+        <div class="store-card">
+          <div class="store-district" id="sidebar-district">—</div>
+          <div class="store-name" id="sidebar-store-name">—</div>
+          <div class="sidebar-selects">
+            <select id="sidebar-district-select" aria-label="切换商圈"></select>
+            <select id="sidebar-store-select" aria-label="切换门店"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">诊断导航</div>
+        <nav class="nav-menu" id="nav-menu">
+          <a class="nav-item" href="#district" data-view="view-district"><span class="nav-num">01</span>选择商圈</a>
+          <a class="nav-item" href="#store" data-view="view-store"><span class="nav-num">02</span>选择门店</a>
+          <a class="nav-item" href="#overview" data-view="view-overview"><span class="nav-num">03</span>经营状态</a>
+          <a class="nav-item" href="#customer" data-view="view-customer"><span class="nav-num">04</span>客群分析</a>
+          <a class="nav-item" href="#product" data-view="view-product"><span class="nav-num">05</span>商品分析</a>
+          <a class="nav-item" href="#operations" data-view="view-operations"><span class="nav-num">06</span>经营数据</a>
+          <a class="nav-item" href="#ugc" data-view="view-ugc"><span class="nav-num">07</span>用户满意度</a>
+          <a class="nav-item" href="#issues" data-view="view-issues"><span class="nav-num">08</span>AI识别问题</a>
+          <a class="nav-item" href="#actions" data-view="view-actions"><span class="nav-num">09</span>行动建议</a>
+          <a class="nav-item" href="#report" data-view="view-report"><span class="nav-num">10</span>诊断报告</a>
+          <a class="nav-item" href="#compare" data-view="view-compare"><span class="nav-num">11</span>门店对比</a>
+          <!-- 已下线(需求4/6)：库存分析、营销分析、问题优化排序 —— 入口移除，代码注释保留，
+               待库存/营销数据接入后恢复。对应视图与加载器见下方注释块与 app.js COMMENTED_LOADERS。
+          <a class="nav-item" href="#inventory" data-view="view-inventory"><span class="nav-num">--</span>库存分析</a>
+          <a class="nav-item" href="#marketing" data-view="view-marketing"><span class="nav-num">--</span>营销分析</a>
+          <a class="nav-item" href="#priority" data-view="view-priority"><span class="nav-num">--</span>问题优化排序</a>
+          -->
+        </nav>
+      </div>
+
+      <div class="sidebar-user">
+        <span class="sidebar-user-name" id="sidebar-user">—</span>
+        <button class="btn-logout" id="btn-logout" type="button">退出登录</button>
+      </div>
+    </aside>
+
+    <!-- ===== 右侧主内容（长页滚动） ===== -->
+    <main class="main-content longpage" id="main-content">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h2>经营诊断工作台</h2>
+        </div>
+        <div class="topbar-right">
+          <span class="user-chip" id="topbar-user">—</span>
+        </div>
+      </div>
+
+      <!-- 商圈/门店选择条（双端选择：右侧主区，需求2） -->
+      <section class="selector-bar" id="selector-bar">
+        <div class="selector-group">
+          <label for="district-select">商圈</label>
+          <select id="district-select"></select>
+        </div>
+        <div class="selector-group">
+          <label for="store-select">门店</label>
+          <select id="store-select"></select>
+        </div>
+        <span id="selector-source" class="src-badge src-default" hidden>默认报告</span>
+        <button class="btn-primary" id="btn-diagnose" type="button">实时诊断<small>约 3 分钟</small></button>
+      </section>
+
+      <!-- 实时诊断进度（仅实时调用时展示，不伪造逐节点完成态） -->
+      <section class="run-console" id="run-console" hidden>
+        <div class="run-head">
+          <div class="run-title">工作流执行进度</div>
+          <div class="run-status" id="run-status">发起中…</div>
+        </div>
+        <div class="progress-bar"><i id="progress-fill" style="width:6%"></i></div>
+        <div class="phase-list" id="phase-list"></div>
+        <div class="run-note">预计耗时约 3 分钟，请勿关闭页面。响应未返回前所有阶段保持「分析中」，不做虚假完成态。</div>
+      </section>
+
+      <section class="error-banner" id="error-banner" hidden></section>
+
+      <!-- 01 选择商圈 -->
+      <section class="view-anchor" id="view-district">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">选择商圈</div>
+          </div>
+          <div class="district-grid" id="district-grid"></div>
+        </div>
+      </section>
+
+      <!-- 02 选择门店 -->
+      <section class="view-anchor" id="view-store">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">选择门店</div>
+            <div class="view-sub" id="store-sub">—</div>
+          </div>
+          <div class="store-grid" id="store-grid"></div>
+        </div>
+      </section>
+
+      <!-- 03 经营状态 -->
+      <section class="view-anchor" id="view-overview">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">经营状态</div>
+            <div class="view-sub" id="overview-sub">—</div>
+          </div>
+          <div id="overview-body"></div>
+        </div>
+      </section>
+
+      <!-- 04 客群分析 -->
+      <section class="view-anchor" id="view-customer">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">客群分析</div>
+          </div>
+          <div id="customer-body"></div>
+        </div>
+      </section>
+
+      <!-- 05 商品分析 -->
+      <section class="view-anchor" id="view-product">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">商品分析</div>
+          </div>
+          <div id="product-body"></div>
+        </div>
+      </section>
+
+      <!-- 06 经营数据 -->
+      <section class="view-anchor" id="view-operations">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">经营数据</div>
+          </div>
+          <div id="operations-body"></div>
+        </div>
+      </section>
+
+      <!-- 07 用户满意度（主题分析 + 情感镜像，需求3） -->
+      <section class="view-anchor" id="view-ugc">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">用户满意度</div>
+            <div class="view-sub" id="ugc-sub">主题分析 · 情感镜像 · 基于真实 UGC 语料的确定性统计</div>
+          </div>
+          <div id="ugc-body"></div>
+        </div>
+      </section>
+
+      <!-- 08 AI识别问题（仅客群类别，需求5） -->
+      <section class="view-anchor" id="view-issues">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">AI识别问题</div>
+          </div>
+          <div id="issues-body"></div>
+        </div>
+      </section>
+
+      <!-- 09 行动建议（与客群问题一一映射，需求7） -->
+      <section class="view-anchor" id="view-actions">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">行动建议</div>
+          </div>
+          <div id="actions-body"></div>
+        </div>
+      </section>
+
+      <!-- 10 诊断报告（默认展示当前报告内容，需求8） -->
+      <section class="view-anchor" id="view-report">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">诊断报告</div>
+            <div class="view-sub" id="report-sub">当前展示：默认报告（数据资产生成，非实时调用）</div>
+          </div>
+          <div class="report-actions">
+            <button class="btn-primary" id="btn-export-txt" type="button">⬇ 生成诊断报告（下载 TXT）</button>
+          </div>
+          <div id="report-body"></div>
+        </div>
+      </section>
+
+      <!-- 11 门店对比（双店并排对照，数据来自默认报告数据集） -->
+      <section class="view-anchor" id="view-compare">
+        <div class="view-inner">
+          <div class="view-head">
+            <div class="view-title">门店对比</div>
+            <div class="view-sub">数据来自默认报告数据集（非实时调用） · 语料口径差异在满意度卡如实标注</div>
+          </div>
+          <div id="compare-body"></div>
+        </div>
+      </section>
+
+      <!-- ===== 已下线模块（需求4/6）：代码注释保留，数据接入后恢复 =====
+      <section class="view-anchor" id="view-inventory">
+        <div class="view-inner">
+          <div class="view-head"><div class="view-title">库存分析</div></div>
+          <div id="inventory-body"></div>
+        </div>
+      </section>
+      <section class="view-anchor" id="view-marketing">
+        <div class="view-inner">
+          <div class="view-head"><div class="view-title">营销分析</div></div>
+          <div id="marketing-body"></div>
+        </div>
+      </section>
+      <section class="view-anchor" id="view-priority">
+        <div class="view-inner">
+          <div class="view-head"><div class="view-title">问题优化排序</div></div>
+          <div id="priority-body"></div>
+        </div>
+      </section>
+      ===== 下线结束 ===== -->
+
+      <div class="toast" id="toast"></div>
+    </main>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
