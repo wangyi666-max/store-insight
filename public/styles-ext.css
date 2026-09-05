@@ -1003,3 +1003,65 @@ a { text-decoration: none; color: inherit; }
 
 /* 极端短板轴标红(好评率 ≤30 直观可辨) */
 .axis-low { fill: #c03d34; font-weight: 700; }
+
+/* ---------- V5.6 排版纠偏:健康框居中/环形图居中/标签条收紧 ---------- */
+.health-card .health-main, .repurchase-main { align-items: center !important; }
+.health-grade {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 34px; height: 28px; padding: 0 9px; line-height: 1;
+  font-size: 13px; box-sizing: border-box;
+}
+.donut-row { justify-content: center; gap: 44px; padding: 8px 0 4px; }
+.tagbar-row { margin-bottom: 10px; }
+.tagbar-row:last-child { margin-bottom: 2px; }
+.tagbar-row .tb-track { height: 7px; background: #edf0f2; border-radius: 999px; overflow: hidden; margin: 2px 0 6px; }
+.tagbar-row .tb-fill { height: 100%; background: var(--green-600); border-radius: 999px; transition: width .5s ease; }
+
+/* ---------- 前台侧栏账户下拉(点账户名展开) ---------- */
+.sidebar-user { position: relative; display: block; margin-bottom: 8px; }
+.sidebar-user-chip {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  width: 100%; padding: 8px 10px; border-radius: 8px; cursor: pointer;
+  user-select: none; transition: background .12s ease;
+}
+.sidebar-user-chip:hover { background: rgba(255, 255, 255, .06); }
+.sidebar-user-caret {
+  width: 6px; height: 6px; flex: none; margin-top: -2px;
+  border-right: 1.5px solid #8fa893; border-bottom: 1.5px solid #8fa893;
+  transform: rotate(45deg); transition: transform .15s ease;
+}
+.user-menu-wrap.open .sidebar-user-caret { transform: rotate(-135deg); margin-top: 2px; }
+.sidebar-dropdown {
+  position: absolute; left: 0; right: 0; bottom: calc(100% + 6px); z-index: 60;
+  background: #fff; border: 1px solid var(--gray-200); border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(18, 42, 27, .16); padding: 6px;
+}
+.sd-account { display: flex; align-items: center; gap: 9px; padding: 8px 8px 9px; border-bottom: 1px solid var(--gray-100); margin-bottom: 4px; }
+.sd-avatar {
+  width: 28px; height: 28px; border-radius: 50%; flex: none;
+  background: var(--green-700); color: #fff; font-size: 12px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.sd-meta { display: flex; flex-direction: column; min-width: 0; }
+.sd-meta b { font-size: 12.5px; color: var(--gray-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sd-meta i { font-style: normal; font-size: 10.5px; color: var(--gray-400); margin-top: 1px; }
+.sd-item {
+  display: block; width: 100%; text-align: left; font-size: 12.5px; color: var(--gray-700);
+  background: none; border: 0; border-radius: 6px; padding: 8px 10px; cursor: pointer;
+}
+.sd-item:hover { background: #fdf0ee; color: #c03d34; }
+
+/* ---------- V5.6b 行动卡两列+健康分行高 ---------- */
+.health-score { line-height: 1; }
+.action-grid { display: flex; gap: 20px; align-items: flex-start; margin-top: 2px; }
+.action-grid .action-steps { flex: 1; min-width: 0; margin: 0; }
+.action-grid .action-chips {
+  flex: none; width: 260px; flex-direction: column; align-items: flex-start;
+  gap: 6px; margin-top: 0; padding-top: 0; border-top: 0;
+}
+.action-grid .act-chip { max-width: 100%; }
+@media (max-width: 768px) {
+  .action-grid { flex-direction: column; gap: 8px; }
+  .action-grid .action-chips { width: 100%; flex-direction: row; flex-wrap: wrap; }
+}
+.health-card .health-score, .repurchase-main .health-score { margin-bottom: 0; }

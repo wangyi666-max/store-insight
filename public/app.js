@@ -45,6 +45,8 @@
       var uname = localStorage.getItem('sip_username') || '';
       $('sidebar-user').textContent = uname;
       $('topbar-user').textContent = uname;
+      $('sd-name').textContent = uname;
+      $('sd-avatar').textContent = (uname.charAt(0) || '·').toUpperCase();
       buildSelectors();
       buildNavSpy();
       bindEvents();
@@ -277,6 +279,21 @@
   function bindEvents() {
     $('btn-diagnose').addEventListener('click', startLiveDiagnosis);
     $('btn-logout').addEventListener('click', function () { API.logout(); });
+
+    /* 侧栏账户菜单:点击账户名展开(个人信息+退出登录),点击外部收起 */
+    var suWrap = $('sidebar-user-wrap'), suDd = $('sidebar-dropdown');
+    $('sidebar-user-chip').addEventListener('click', function (e) {
+      e.stopPropagation();
+      var willOpen = suDd.hidden;
+      suDd.hidden = !willOpen;
+      suWrap.classList.toggle('open', willOpen);
+    });
+    document.addEventListener('click', function (e) {
+      if (!suDd.hidden && !suWrap.contains(e.target)) {
+        suDd.hidden = true;
+        suWrap.classList.remove('open');
+      }
+    });
     $('btn-export-txt').addEventListener('click', exportReportTxt);
 
     // 问题卡折叠（容器常驻、innerHTML 重建，委托挂容器）
@@ -903,12 +920,13 @@
           return '<div class="action-card">' +
             actionJumpHtml(a.issue_ref, refIdx) +
             '<div class="action-head"><span class="pr-badge ' + prClass(a.priority) + '">' + esc(a.priority) + '</span><b>' + esc(a.title) + '</b></div>' +
+            '<div class="action-grid">' +
             '<ol class="action-steps">' + (a.steps || []).map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ol>' +
             '<div class="action-chips">' +
             (a.expected ? '<span class="act-chip act-chip-effect">预期效果：' + esc(a.expected) + '</span>' : '') +
             (a.cycle ? '<span class="act-chip">周期：' + esc(a.cycle) + '</span>' : '') +
             (a.difficulty ? '<span class="act-chip">难度：' + esc(a.difficulty) + '</span>' : '') +
-            '</div></div>';
+            '</div></div></div>';
         }).join('');
       }
     } else {
@@ -1322,7 +1340,7 @@
 
   function drawDonut(container, segments) {
     if (!container) return;
-    var size = 148, r = 56, c = 2 * Math.PI * r, cx = size / 2, cy = size / 2;
+    var size = 168, r = 64, c = 2 * Math.PI * r, cx = size / 2, cy = size / 2;
     var total = segments.reduce(function (s, d) { return s + d.value; }, 0);
     if (!total) { container.innerHTML = emptyStateHtml('缺数据'); return; }
     var offset = 0;
@@ -1330,7 +1348,7 @@
       segments.map(function (d) {
         var frac = d.value / total;
         var len = Math.max(frac - 0.008, 0) * c;
-        var seg = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + d.color + '" stroke-width="22" ' +
+        var seg = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + d.color + '" stroke-width="24" ' +
           'stroke-dasharray="' + len.toFixed(2) + ' ' + (c - len).toFixed(2) + '" stroke-dashoffset="' + (-offset * c).toFixed(2) + '" ' +
           'transform="rotate(-90 ' + cx + ' ' + cy + ')"/>';
         offset += frac;

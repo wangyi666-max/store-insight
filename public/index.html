@@ -52,9 +52,18 @@
         </nav>
       </div>
 
-      <div class="sidebar-user">
-        <span class="sidebar-user-name" id="sidebar-user">—</span>
-        <button class="btn-logout" id="btn-logout" type="button">退出登录</button>
+      <div class="sidebar-user user-menu-wrap" id="sidebar-user-wrap">
+        <div class="sidebar-user-chip" id="sidebar-user-chip" role="button" tabindex="0">
+          <span class="sidebar-user-name" id="sidebar-user">—</span>
+          <span class="sidebar-user-caret"></span>
+        </div>
+        <div class="sidebar-dropdown" id="sidebar-dropdown" hidden>
+          <div class="sd-account">
+            <span class="sd-avatar" id="sd-avatar">·</span>
+            <span class="sd-meta"><b id="sd-name">—</b><i>已登录 · 会话 7 天有效</i></span>
+          </div>
+          <button class="sd-item" id="btn-logout" type="button">退出登录</button>
+        </div>
       </div>
     </aside>
 
