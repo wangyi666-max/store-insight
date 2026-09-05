@@ -385,8 +385,8 @@
           '</tr></thead><tbody>';
         j.list.forEach(function (a) {
           html += '<tr><td>' + esc(a.id) + '</td>' +
-            '<td><div class="cell-main">' + esc(a.name) + '</div>' + (a.intro ? '<div class="cell-sub cell-ellipsis" title="' + esc(a.intro) + '">' + esc(a.intro) + '</div>' : '') + (a.attachment ? '<div class="cell-sub">附件:' + esc(a.attachment) + '</div>' : '') + '</td>' +
-            '<td>' + esc(a.boardName) + '</td><td class="cell-ellipsis" title="' + esc(a.source) + '">' + esc(a.source) + '</td>' +
+            '<td><div class="cell-main">' + esc(a.name) + '</div>' + (a.intro ? '<div class="cell-sub cell-ellipsis">' + esc(a.intro) + '</div>' : '') + (a.attachment ? '<div class="cell-sub">附件:' + esc(a.attachment) + '</div>' : '') + '</td>' +
+            '<td>' + esc(a.boardName) + '</td><td class="cell-ellipsis">' + esc(a.source) + '</td>' +
             '<td>' + esc(a.updateCycle || '-') + '</td><td>' + esc(a.scale || '-') + '</td><td>' + esc(a.owner || '-') + '</td>' +
             '<td>' + (a.status === 'archived' ? '<span class="tag tag-arch">已归档</span>' : '<span class="tag tag-on">在册</span>') + '</td>' +
             (canEdit() ? '<td class="row-actions">' +
@@ -490,16 +490,16 @@
       if (!j.list.length) { box.innerHTML = emptyHtml('暂无商圈档案'); }
       else {
         var html = '<table class="data-table"><thead><tr>' +
-          '<th>编号</th><th>商圈名称</th><th>所在城市</th><th>行政区</th><th>经纬度</th><th>规模</th><th>标签</th><th>开业年限</th><th>门店数</th>' + (canEdit() ? '<th>操作</th>' : '') +
+          '<th>编号</th><th>商圈名称</th><th>所在城市</th><th>行政区</th><th>经纬度</th><th>规模</th><th>标签</th><th class="num">开业年限</th><th class="num">门店数</th>' + (canEdit() ? '<th>操作</th>' : '') +
           '</tr></thead><tbody>';
         j.list.forEach(function (d) {
           html += '<tr><td>' + esc(d.code) + '</td>' +
-            '<td><div class="cell-main">' + esc(d.name) + '</div>' + (d.remark ? '<div class="cell-sub cell-ellipsis" title="' + esc(d.remark) + '">' + esc(d.remark) + '</div>' : '') + '</td>' +
+            '<td><div class="cell-main">' + esc(d.name) + '</div>' + (d.remark ? '<div class="cell-sub cell-ellipsis">' + esc(d.remark) + '</div>' : '') + '</td>' +
             '<td>' + esc(d.city || '-') + '</td><td>' + esc(d.region || '-') + '</td>' +
             '<td>' + (d.lng && d.lat ? esc(d.lng) + ',' + esc(d.lat) : '-') + '</td>' +
             '<td>' + esc(d.scale || '-') + '</td>' +
             '<td>' + (d.tags || []).map(function (t) { return '<span class="tag-mini">' + esc(t) + '</span>'; }).join('') + '</td>' +
-            '<td>' + esc(d.years || '-') + '</td><td>' + (d.storeCount || 0) + '</td>' +
+            '<td class="num">' + esc(d.years || '-') + '</td><td class="num">' + (d.storeCount || 0) + '</td>' +
             (canEdit() ? '<td class="row-actions">' +
               '<button class="btn btn-sm" data-act="edit" data-id="' + d.code + '">编辑</button>' +
               '<button class="btn btn-sm btn-danger" data-act="del" data-id="' + d.code + '" data-n="' + esc(d.name) + '">删除</button></td>' : '') +
@@ -603,12 +603,12 @@
       if (!j.list.length) { box.innerHTML = emptyHtml('暂无门店档案'); }
       else {
         var html = '<table class="data-table"><thead><tr>' +
-          '<th>编号</th><th>门店名称</th><th>所属商圈</th><th>业态类型</th><th>面积(㎡)</th><th>营业状态</th><th>入驻时间</th><th>详细地址</th>' + (canEdit() ? '<th>操作</th>' : '') +
+          '<th>编号</th><th>门店名称</th><th>所属商圈</th><th>业态类型</th><th class="num">面积(㎡)</th><th>营业状态</th><th>入驻时间</th><th>详细地址</th>' + (canEdit() ? '<th>操作</th>' : '') +
           '</tr></thead><tbody>';
         j.list.forEach(function (st) {
           html += '<tr><td>' + esc(st.code) + '</td>' +
-            '<td><div class="cell-main">' + esc(st.name) + '</div>' + (st.remark ? '<div class="cell-sub cell-ellipsis" title="' + esc(st.remark) + '">' + esc(st.remark) + '</div>' : '') + '</td>' +
-            '<td>' + esc(st.district) + '</td><td>' + esc(st.industry || '-') + '</td><td>' + esc(st.area || '-') + '</td>' +
+            '<td><div class="cell-main">' + esc(st.name) + '</div>' + (st.remark ? '<div class="cell-sub cell-ellipsis">' + esc(st.remark) + '</div>' : '') + '</td>' +
+            '<td>' + esc(st.district) + '</td><td>' + esc(st.industry || '-') + '</td><td class="num">' + esc(st.area || '-') + '</td>' +
             '<td>' + storeStatusTag(st.status) + '</td><td>' + esc(st.openedAt || '-') + '</td>' +
             '<td>' + (st.address ? esc(st.address) : '<span class="cell-sub">待补录</span>') + '</td>' +
             (canEdit() ? '<td class="row-actions">' +

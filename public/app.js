@@ -714,10 +714,10 @@
         html += '<div class="grid-2col radar-grid"><div class="card"><div class="card-title">五大主题维度雷达</div>' +
           '<div id="ug-radar" class="radar-box"></div></div>';
         html += '<div class="card"><div class="card-title">主题明细</div><table class="data-table"><thead><tr>' +
-          '<th>主题</th><th>好评率</th><th>好评</th><th>中立</th><th>差评</th><th>高频词</th></tr></thead><tbody>' +
+          '<th>主题</th><th class="num">好评率</th><th class="num">好评</th><th class="num">中立</th><th class="num">差评</th><th>高频词</th></tr></thead><tbody>' +
           themes.map(function (t) {
-            return '<tr><td>' + esc(t.name) + '</td><td>' + (t.score != null ? t.score + '%' : '—') + '</td>' +
-              '<td class="pos-cell">' + t.pos + '</td><td>' + (t.neu || 0) + '</td><td class="neg-cell">' + t.neg + '</td>' +
+            return '<tr><td>' + esc(t.name) + '</td><td class="num">' + (t.score != null ? t.score + '%' : '—') + '</td>' +
+              '<td class="num pos-cell">' + t.pos + '</td><td class="num">' + (t.neu || 0) + '</td><td class="num neg-cell">' + t.neg + '</td>' +
               '<td class="kw-cell">' + esc((t.keywords || []).join(' / ')) + '</td></tr>';
           }).join('') + '</tbody></table></div></div>';
 

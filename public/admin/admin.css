@@ -60,7 +60,6 @@ input, select, textarea { font-family: inherit; font-size: 13px; color: var(--te
 .al-card-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 26px; }
 .al-card-brand img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
 .al-card-title { font-size: 17px; font-weight: 700; color: var(--ink); margin: 0; }
-.al-card-note { font-size: 12px; color: var(--text-2); margin: -18px 0 20px; }
 .al-label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 6px; color: var(--ink); }
 .al-input {
   width: 100%; padding: 10px 12px; border: 1px solid var(--line-dark); border-radius: 6px;
@@ -119,7 +118,7 @@ input, select, textarea { font-family: inherit; font-size: 13px; color: var(--te
 }
 .user-name { font-weight: 600; color: var(--ink); }
 .link-btn { background: none; border: none; color: var(--text-2); font-size: 13px; padding: 4px 6px; }
-.link-btn:hover { color: var(--red); }
+.link-btn:hover { color: var(--green); }
 
 .view { padding: 20px 24px 40px; display: none; }
 .view.active { display: block; }
@@ -128,14 +127,14 @@ input, select, textarea { font-family: inherit; font-size: 13px; color: var(--te
 .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
 .toolbar .spacer { flex: 1; }
 .tb-input, .tb-select {
-  padding: 8px 10px; border: 1px solid var(--line-dark); border-radius: 6px; background: #fff; outline: none;
+  height: 36px; padding: 0 10px; border: 1px solid var(--line-dark); border-radius: 6px; background: #fff; outline: none;
 }
 .tb-input { width: 220px; }
 .tb-input:focus, .tb-select:focus { border-color: var(--green); }
 
 /* 按钮 */
 .btn {
-  padding: 8px 14px; border-radius: 6px; font-size: 13px; border: 1px solid var(--line-dark);
+  height: 36px; padding: 0 14px; border-radius: 6px; font-size: 13px; border: 1px solid var(--line-dark);
   background: #fff; color: var(--text); transition: all .15s;
 }
 .btn:hover { border-color: var(--green); color: var(--green); }
@@ -143,20 +142,21 @@ input, select, textarea { font-family: inherit; font-size: 13px; color: var(--te
 .btn-primary:hover { background: var(--green-2); color: #fff; }
 .btn-danger { color: var(--red); }
 .btn-danger:hover { border-color: var(--red); color: var(--red); }
-.btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 5px; }
+.btn-sm { height: auto; padding: 4px 10px; font-size: 12px; border-radius: 5px; }
 .btn[disabled] { opacity: .5; cursor: not-allowed; }
 .row-actions .btn { margin-right: 6px; }
 
 /* 表格 */
-.table-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.table-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th {
   text-align: left; font-size: 12px; color: var(--text-2); font-weight: 600;
-  padding: 10px 12px; background: #f4f0e4; border-bottom: 1px solid var(--line); white-space: nowrap;
+  padding: 11px 12px; background: #f4f0e4; border-bottom: 1px solid var(--line); white-space: nowrap;
 }
-.data-table td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid #efe9da; vertical-align: top; }
+.data-table td { padding: 12px; font-size: 13px; border-bottom: 1px solid #efe9da; vertical-align: top; }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: #faf6ec; }
+.data-table .num, .data-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .cell-main { font-weight: 600; color: var(--ink); }
 .cell-sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
 .cell-ellipsis { max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -174,7 +174,7 @@ input, select, textarea { font-family: inherit; font-size: 13px; color: var(--te
 
 /* 分页 */
 .pager { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 12px; font-size: 12px; color: var(--text-2); border-top: 1px solid var(--line); }
-.pager .btn { padding: 5px 12px; font-size: 12px; }
+.pager .btn { height: auto; padding: 5px 12px; font-size: 12px; }
 
 /* 空态(缺数据一等公民:虚线卡片) */
 .empty-state {
@@ -192,9 +192,10 @@ input, select, textarea { font-family: inherit; font-size: 13px; color: var(--te
 .modal { width: 620px; max-width: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
 .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); }
 .modal-title { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0; }
-.modal-close { background: none; border: none; font-size: 18px; color: var(--text-2); line-height: 1; padding: 2px 6px; }
-.modal-close:hover { color: var(--red); }
-.modal-body { padding: 18px 20px; }
+.modal-close { background: none; border: none; font-size: 18px; color: var(--text-2); line-height: 1; padding: 4px 8px; border-radius: 6px; }
+.modal-close:hover { color: var(--red); background: #f4f1e8; }
+.modal-body { padding: 18px 20px; overflow-x: auto; }
+.modal-body .guide-table { min-width: 520px; }
 .modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--line); }
 
 .modal.modal-guide { width: 780px; }
@@ -251,7 +252,8 @@ input, select, textarea { font-family: inherit; font-size: 13px; color: var(--te
   .form-grid { grid-template-columns: 1fr; }
   .form-grid .span2 { grid-column: span 1; }
   .tb-input { width: 150px; }
-  .data-table { display: block; overflow-x: auto; }
+  .table-card { overflow-x: auto; }
+  .table-card .data-table { min-width: 640px; }
 }
 
 /* ---------- 顶栏账户下拉菜单 ---------- */
@@ -270,3 +272,14 @@ input, select, textarea { font-family: inherit; font-size: 13px; color: var(--te
   background: none; border: 0; border-radius: 6px; padding: 8px 12px; cursor: pointer;
 }
 .user-dropdown-item:hover { background: #f4f1e8; color: var(--red, #c03d34); }
+
+/* ---------- 品质提升层(2026-09-06 后台审核):输入控件边框辨识度 + 细滚动条 ---------- */
+.al-input, .tb-input, .tb-select, .field input, .field select, .field textarea,
+.board-row input[type=text] { border-color: #c9bfa6; }
+body::-webkit-scrollbar, .admin-main::-webkit-scrollbar, .side-nav::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar, .table-card::-webkit-scrollbar { width: 8px; height: 8px; }
+body::-webkit-scrollbar-thumb, .admin-main::-webkit-scrollbar-thumb, .side-nav::-webkit-scrollbar-thumb,
+.modal-body::-webkit-scrollbar-thumb, .table-card::-webkit-scrollbar-thumb { background: #d8d2c0; border-radius: 4px; }
+body::-webkit-scrollbar-thumb:hover, .admin-main::-webkit-scrollbar-thumb:hover { background: #c4bda6; }
+body::-webkit-scrollbar-track, .admin-main::-webkit-scrollbar-track, .side-nav::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track, .table-card::-webkit-scrollbar-track { background: transparent; }

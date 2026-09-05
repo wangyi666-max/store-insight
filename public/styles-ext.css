@@ -608,7 +608,9 @@ a { text-decoration: none; color: inherit; }
   text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
 }
 .sidebar-selects select:focus, .selector-bar select:focus { border-color: var(--green-600); box-shadow: 0 0 0 3px var(--green-100); }
-.selector-bar select { width: auto; min-width: 148px; max-width: 240px; }
+.selector-bar select { width: auto; min-width: 148px; max-width: 240px; height: 36px; padding-top: 0; padding-bottom: 0; }
+.selector-bar .btn-primary { height: 36px; padding-top: 0; padding-bottom: 0; }
+#view-ugc .data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
 .nav-item {
   text-decoration: none !important;
   white-space: nowrap;
