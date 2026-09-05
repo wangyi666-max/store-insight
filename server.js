@@ -202,11 +202,11 @@ function ensureAdminAccounts() {
     if (!u.status) { u.status = 'enabled'; changed = true; }
   }
   if (!users.some((u) => u.role === 'admin')) {
-    // 公开部署时通过环境变量覆盖初始密码,避免仓库公开后后台默认口令泄露
+    // 公开部署时通过环境变量覆盖初始密码,避免仓库公开后后台默认口令泄露(短名:部署平台对变量名有长度限制)
     const defaults = [
-      ['admin', process.env.ADMIN_INIT_PASSWORD || 'admin123456', '系统管理员', 'admin'],
-      ['operator01', process.env.OPERATOR_INIT_PASSWORD || 'op123456', '运营演示账号', 'operator'],
-      ['viewer01', process.env.VIEWER_INIT_PASSWORD || 'view123456', '只读演示账号', 'viewer']
+      ['admin', process.env.ADMIN_PWD || 'admin123456', '系统管理员', 'admin'],
+      ['operator01', process.env.OP_PWD || 'op123456', '运营演示账号', 'operator'],
+      ['viewer01', process.env.VIEW_PWD || 'view123456', '只读演示账号', 'viewer']
     ];
     for (const [username, pwd, name, role] of defaults) {
       if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) continue;
