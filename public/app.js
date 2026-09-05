@@ -45,8 +45,6 @@
       var uname = localStorage.getItem('sip_username') || '';
       $('sidebar-user').textContent = uname;
       $('topbar-user').textContent = uname;
-      $('sd-name').textContent = uname;
-      $('sd-avatar').textContent = (uname.charAt(0) || '·').toUpperCase();
       buildSelectors();
       buildNavSpy();
       bindEvents();
@@ -280,18 +278,19 @@
     $('btn-diagnose').addEventListener('click', startLiveDiagnosis);
     $('btn-logout').addEventListener('click', function () { API.logout(); });
 
-    /* 侧栏账户菜单:点击账户名展开(个人信息+退出登录),点击外部收起 */
-    var suWrap = $('sidebar-user-wrap'), suDd = $('sidebar-dropdown');
-    $('sidebar-user-chip').addEventListener('click', function (e) {
+    /* 顶栏账户菜单:点击账户名展开退出登录,点击外部收起 */
+    $('btn-top-logout').addEventListener('click', function () { API.logout(); });
+    var tuWrap = $('topbar-user-wrap'), tuDd = $('topbar-dropdown');
+    $('topbar-user-chip').addEventListener('click', function (e) {
       e.stopPropagation();
-      var willOpen = suDd.hidden;
-      suDd.hidden = !willOpen;
-      suWrap.classList.toggle('open', willOpen);
+      var willOpen = tuDd.hidden;
+      tuDd.hidden = !willOpen;
+      tuWrap.classList.toggle('open', willOpen);
     });
     document.addEventListener('click', function (e) {
-      if (!suDd.hidden && !suWrap.contains(e.target)) {
-        suDd.hidden = true;
-        suWrap.classList.remove('open');
+      if (!tuDd.hidden && !tuWrap.contains(e.target)) {
+        tuDd.hidden = true;
+        tuWrap.classList.remove('open');
       }
     });
     $('btn-export-txt').addEventListener('click', exportReportTxt);

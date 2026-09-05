@@ -52,18 +52,9 @@
         </nav>
       </div>
 
-      <div class="sidebar-user user-menu-wrap" id="sidebar-user-wrap">
-        <div class="sidebar-user-chip" id="sidebar-user-chip" role="button" tabindex="0">
-          <span class="sidebar-user-name" id="sidebar-user">—</span>
-          <span class="sidebar-user-caret"></span>
-        </div>
-        <div class="sidebar-dropdown" id="sidebar-dropdown" hidden>
-          <div class="sd-account">
-            <span class="sd-avatar" id="sd-avatar">·</span>
-            <span class="sd-meta"><b id="sd-name">—</b><i>已登录 · 会话 7 天有效</i></span>
-          </div>
-          <button class="sd-item" id="btn-logout" type="button">退出登录</button>
-        </div>
+      <div class="sidebar-user">
+        <span class="sidebar-user-name" id="sidebar-user">—</span>
+        <button class="btn-logout" id="btn-logout" type="button">退出登录</button>
       </div>
     </aside>
 
@@ -74,7 +65,15 @@
           <h2>经营诊断工作台</h2>
         </div>
         <div class="topbar-right">
-          <span class="user-chip" id="topbar-user">—</span>
+          <div class="topbar-user-wrap" id="topbar-user-wrap">
+            <div class="user-chip topbar-user-chip" id="topbar-user-chip" role="button" tabindex="0">
+              <span id="topbar-user">—</span>
+              <span class="topbar-caret"></span>
+            </div>
+            <div class="topbar-dropdown" id="topbar-dropdown" hidden>
+              <button class="topbar-dropdown-item" id="btn-top-logout" type="button">退出登录</button>
+            </div>
+          </div>
         </div>
       </div>
 
