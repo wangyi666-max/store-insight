@@ -974,3 +974,19 @@ a { text-decoration: none; color: inherit; }
 
 /* KPI 数值层级略提 */
 .kpi-num { font-size: 22px; }
+
+/* ---------- V5 美化第二轮(成熟 B 端模式,不回退已定调项) ---------- */
+
+/* 数据表:行 hover 底色 + 行高舒展(Ant Design Pro 表格模式) */
+.data-table tbody tr { transition: background .12s ease; }
+.data-table tbody tr:hover { background: #f7faf8; }
+.data-table td { padding-top: 13px; padding-bottom: 13px; }
+
+/* 主区滚动条细化(Linear/Notion 风格) */
+.main::-webkit-scrollbar, body::-webkit-scrollbar { width: 8px; }
+.main::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+.main::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover { background: var(--gray-300); }
+.main::-webkit-scrollbar-track, body::-webkit-scrollbar-track { background: transparent; }
+
+/* 顶部选择条:毛玻璃 sticky(Stripe/Linear 模式) */
+.selector-bar { background: rgba(255, 255, 255, .88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }

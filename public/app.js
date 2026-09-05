@@ -42,8 +42,11 @@
       var meta = API.state.meta;
       current.district = meta.defaultDistrict;
       current.store = meta.defaultStore;
-      $('sidebar-user').textContent = localStorage.getItem('sip_username') || '';
-      $('topbar-user').textContent = localStorage.getItem('sip_username') || '';
+      var uname = localStorage.getItem('sip_username') || '';
+      $('sidebar-user').textContent = uname;
+      $('topbar-user').textContent = uname;
+      // 答辩演示账号隐藏退出登录入口（防现场误退；换账号可直接访问 /login.html 重新登录覆盖 token）
+      if (uname.toLowerCase() === 'wy_123456') { var lb = $('btn-logout'); if (lb) lb.style.display = 'none'; }
       buildSelectors();
       buildNavSpy();
       bindEvents();
