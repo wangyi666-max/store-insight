@@ -716,17 +716,17 @@
       '<tr><td><span class="tag tag-viewer">只读人员</span></td><td>—</td><td>—(编辑入口已隐藏)</td><td>√</td></tr>' +
       '</tbody></table>' +
       '<h4>预置演示账号</h4>' +
-      '<table class="data-table guide-table"><thead><tr><th>账号</th><th>密码</th><th>角色</th></tr></thead><tbody>' +
-      '<tr><td>admin</td><td>admin123456</td><td>管理员</td></tr>' +
-      '<tr><td>operator01</td><td>op123456</td><td>运营人员</td></tr>' +
-      '<tr><td>viewer01</td><td>view123456</td><td>只读人员</td></tr>' +
+      '<table class="data-table guide-table"><thead><tr><th>账号</th><th>初始密码</th><th>角色</th></tr></thead><tbody>' +
+      '<tr><td>admin</td><td>由部署方设定</td><td>管理员</td></tr>' +
+      '<tr><td>operator01</td><td>由部署方设定</td><td>运营人员</td></tr>' +
+      '<tr><td>viewer01</td><td>由部署方设定</td><td>只读人员</td></tr>' +
       '</tbody></table>' +
-      '<p class="guide-note">演示环境默认账号,正式使用前请在「用户管理」中重置密码。后台账号只能由管理员在此创建,登录页不提供注册——防止拿到链接的人自行开通后台权限。</p>' +
+      '<p class="guide-note">初始密码由部署方通过环境变量设定,见交付包《公网链接与账号说明》;本地开发环境默认 admin123456 / op123456 / view123456。正式使用前请在「用户管理」中重置密码。后台账号只能由管理员在此创建,登录页不提供注册——防止拿到链接的人自行开通后台权限。</p>' +
       '<h4>常用操作</h4><ul>' +
       '<li>筛选:下拉切换即时生效,关键词输入后回车或点「查询」。</li>' +
       '<li>导出:下载 CSV(带 BOM,Excel 可直接打开)。</li>' +
       '<li>批量导入:弹窗内可下载模板,支持上传 CSV 文件或直接粘贴文本。</li>' +
-      '<li>同一账号可同时在线前台与后台;同一端内新登录会踢掉旧会话。</li></ul>' +
+      '<li>同一账号可同时在线前台与后台。</li></ul>' +
       '</div>';
     openModal('使用说明', body, [{ text: '我知道了', cls: 'btn-primary', onClick: closeModal }]);
     mask.querySelector('.modal').classList.add('modal-guide');
