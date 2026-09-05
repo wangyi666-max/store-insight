@@ -990,3 +990,16 @@ a { text-decoration: none; color: inherit; }
 
 /* 顶部选择条:毛玻璃 sticky(Stripe/Linear 模式) */
 .selector-bar { background: rgba(255, 255, 255, .88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+/* ---------- V5 雷达图可读性与留白修复 ---------- */
+
+/* 雷达+明细:列比 5:7,雷达卡收窄消除两侧留白,表格获得更宽空间 */
+.radar-grid { grid-template-columns: minmax(280px, 4fr) 7fr; }
+.radar-box { display: flex; justify-content: center; }
+.radar-svg { width: 100%; max-width: 340px; height: auto; display: block; }
+
+/* 环刻度读数(25/50/75/100 参照系) */
+.radar-tick { font-size: 9px; fill: #9aa3b3; }
+
+/* 极端短板轴标红(好评率 ≤30 直观可辨) */
+.axis-low { fill: #c03d34; font-weight: 700; }

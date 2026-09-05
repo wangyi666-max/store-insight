@@ -697,7 +697,7 @@
       // 五大主题：雷达 + 明细 + 热力图
       var themes = ug.themes || [];
       if (themes.length) {
-        html += '<div class="grid-2col"><div class="card"><div class="card-title">五大主题维度雷达</div>' +
+        html += '<div class="grid-2col radar-grid"><div class="card"><div class="card-title">五大主题维度雷达</div>' +
           '<div id="ug-radar" class="radar-box"></div></div>';
         html += '<div class="card"><div class="card-title">主题明细</div><table class="data-table"><thead><tr>' +
           '<th>主题</th><th>好评率</th><th>好评</th><th>中立</th><th>差评</th><th>高频词</th></tr></thead><tbody>' +
@@ -776,15 +776,20 @@
       return '<line x1="' + cx + '" y1="' + cy + '" x2="' + p.x + '" y2="' + p.y + '" stroke="#e3e7ec"/>';
     }).join('');
     var vals = themes.map(function (t, i) { var p = pt(i, R * ((t.score != null ? t.score : 0) / 100)); return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+    var ticks = [0.25, 0.5, 0.75, 1].map(function (f) {
+      var p = pt(0, R * f);
+      return '<text class="radar-tick" x="' + (p.x + 5) + '" y="' + (p.y + 3) + '">' + Math.round(f * 100) + '</text>';
+    }).join('');
     var labels = themes.map(function (t, i) {
       var p = pt(i, R + 26);
       var anchor = Math.abs(p.x - cx) < 20 ? 'middle' : (p.x > cx ? 'start' : 'end');
-      return '<text class="axis-text" x="' + p.x + '" y="' + p.y + '" text-anchor="' + anchor + '">' + esc(t.name) +
+      var low = t.score != null && t.score <= 30 ? ' axis-low' : '';
+      return '<text class="axis-text' + low + '" x="' + p.x + '" y="' + p.y + '" text-anchor="' + anchor + '">' + esc(t.name) +
         ' ' + (t.score != null ? t.score : '—') + '</text>';
     }).join('');
-    container.innerHTML = '<svg viewBox="0 0 ' + size + ' ' + size + '" width="100%" height="' + size + '">' +
+    container.innerHTML = '<svg viewBox="0 0 ' + size + ' ' + size + '" class="radar-svg">' +
       rings + axes +
-      '<polygon points="' + vals + '" fill="rgba(22,101,52,0.18)" stroke="#166534" stroke-width="2"/>' + labels + '</svg>';
+      '<polygon points="' + vals + '" fill="rgba(22,101,52,0.18)" stroke="#166534" stroke-width="2"/>' + ticks + labels + '</svg>';
   }
 
   function drawHeatmap(container, themes) {
