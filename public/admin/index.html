@@ -32,13 +32,18 @@
       <div class="admin-topbar">
         <div class="topbar-title" id="topbar-title">数据资产管理</div>
         <div class="topbar-user">
-          <div class="user-chip">
-            <div class="user-avatar" id="user-avatar">·</div>
-            <span class="user-name" id="user-name">-</span>
-            <span class="tag tag-viewer" id="user-role">-</span>
+          <div class="user-menu-wrap" id="user-menu-wrap">
+            <div class="user-chip" id="user-chip" role="button" tabindex="0" title="点击展开账户菜单">
+              <div class="user-avatar" id="user-avatar">·</div>
+              <span class="user-name" id="user-name">-</span>
+              <span class="tag tag-viewer" id="user-role">-</span>
+              <span class="user-caret"></span>
+            </div>
+            <div class="user-dropdown" id="user-dropdown" hidden>
+              <button class="user-dropdown-item" id="btn-logout" type="button">退出登录</button>
+            </div>
           </div>
           <button class="link-btn" id="btn-guide" type="button">使用说明</button>
-          <button class="link-btn" id="btn-logout">退出登录</button>
         </div>
       </div>
 

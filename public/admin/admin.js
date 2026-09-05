@@ -739,6 +739,22 @@
       .finally(function () { logout(); });
   });
 
+  /* 账户菜单:点击账户名展开退出登录,点击外部收起 */
+  var menuWrap = document.getElementById('user-menu-wrap');
+  var userDropdown = document.getElementById('user-dropdown');
+  document.getElementById('user-chip').addEventListener('click', function (e) {
+    e.stopPropagation();
+    var willOpen = userDropdown.hidden;
+    userDropdown.hidden = !willOpen;
+    menuWrap.classList.toggle('open', willOpen);
+  });
+  document.addEventListener('click', function (e) {
+    if (!userDropdown.hidden && !menuWrap.contains(e.target)) {
+      userDropdown.hidden = true;
+      menuWrap.classList.remove('open');
+    }
+  });
+
   if (!state.token) { logout(); return; }
   api('/api/admin/me').then(function (j) {
     state.me = j;

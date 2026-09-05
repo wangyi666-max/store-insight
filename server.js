@@ -189,7 +189,7 @@ function findBuiltin(username) {
   const builtins = [
     { username: 'teacher01', password: 'teach2026', name: '演示教师账号', role: 'member' },
     { username: 'demo_teacher', password: 'demo2026', name: '移动端演示账号', role: 'member' },
-    // 答辩演示账号：侧栏不显示退出登录（前端按用户名隐藏），密码可用 WY_PWD 覆盖
+    // 答辩演示账号，密码可用 WY_PWD 覆盖
     { username: 'wy_123456', password: process.env.WY_PWD || 'wy_123456', name: '演示访客账号', role: 'member' },
     { username: 'admin', password: process.env.ADMIN_PWD || 'admin123456', name: '系统管理员', role: 'admin' },
     { username: 'operator01', password: process.env.OP_PWD || 'op123456', name: '运营演示账号', role: 'operator' },
