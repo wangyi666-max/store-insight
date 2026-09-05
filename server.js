@@ -160,6 +160,47 @@ function findUser(username) {
   return users.find((u) => u.username === username) || null;
 }
 
+// 内置账号兜底：托管部署多实例无共享磁盘，users.json 写读跨请求不可见。
+// 内置演示/后台账号在代码内确定性校验（密码取环境变量），任意实例可登录；
+// 本地 users.json 命中时仍走文件校验（含改密/禁用），兜底仅在线程读不到该用户时生效。
+function findBuiltin(username) {
+  const u = String(username || '').toLowerCase();
+  const builtins = [
+    { username: 'teacher01', password: 'teach2026', name: '演示教师账号', role: 'member' },
+    { username: 'demo_teacher', password: 'demo2026', name: '移动端演示账号', role: 'member' },
+    { username: 'admin', password: process.env.ADMIN_PWD || 'admin123456', name: '系统管理员', role: 'admin' },
+    { username: 'operator01', password: process.env.OP_PWD || 'op123456', name: '运营演示账号', role: 'operator' },
+    { username: 'viewer01', password: process.env.VIEW_PWD || 'view123456', name: '只读演示账号', role: 'viewer' }
+  ];
+  return builtins.find((x) => x.username.toLowerCase() === u) || null;
+}
+
+// 自包含签名会话：token 携带 HMAC 签名，任意实例可验（多实例部署不依赖共享 sessions.json）。
+// 本地签发后同时写入 sessions.json，文件命中时保留"单设备踢下线"语义；部署环境文件不可共享，降级为无状态校验。
+const SESSION_SECRET = crypto.createHash('sha256').update('sip-session:' + (COZE_PAT || 'local-dev')).digest();
+
+function signSessionToken(username, channel) {
+  const payload = Buffer.from(JSON.stringify({
+    u: username, c: channel || 'web', exp: Date.now() + SESSION_TTL_MS, r: crypto.randomBytes(8).toString('hex')
+  })).toString('base64url');
+  const sig = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('base64url');
+  return payload + '.' + sig;
+}
+
+function verifySessionToken(token) {
+  const i = token.lastIndexOf('.');
+  if (i <= 0) return null;
+  const payload = token.slice(0, i);
+  const sig = token.slice(i + 1);
+  const expect = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('base64url');
+  if (sig.length !== expect.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expect))) return null;
+  try {
+    const p = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+    if (!p.u || typeof p.exp !== 'number' || p.exp <= Date.now()) return null;
+    return { username: p.u };
+  } catch (_) { return null; }
+}
+
 function pruneSessions(sessions) {
   const now = Date.now();
   return sessions.filter((s) => s.expiresAt > now);
@@ -173,7 +214,7 @@ function issueToken(username, channel) {
   for (const s of sessions) {
     if (s.username === username && (s.channel || 'web') === channel && !s.replaced) s.replaced = true;
   }
-  const token = crypto.randomBytes(24).toString('hex');
+  const token = signSessionToken(username, channel);
   sessions.push({ token, username, channel, createdAt: Date.now(), expiresAt: Date.now() + SESSION_TTL_MS });
   writeJsonSafe(SESSIONS_FILE, sessions);
   return token;
@@ -240,15 +281,20 @@ function ensureDemoAccounts() {
 }
 
 // 返回 { username } | { replaced: true } | null
+// 先查会话文件（本地命中时保留踢下线语义）；未命中再验签名 token（部署多实例无共享会话文件时兜底）
 function checkSession(req) {
   const h = req.headers['authorization'] || '';
-  const m = h.match(/^Bearer\s+([0-9a-f]{48})$/i);
+  const m = h.match(/^Bearer\s+(\S+)$/i);
   if (!m) return null;
+  const token = m[1];
   const sessions = pruneSessions(readJsonSafe(SESSIONS_FILE, []));
-  const s = sessions.find((x) => x.token === m[1]);
-  if (!s) return null;
-  if (s.replaced) return { replaced: true };
-  return { username: s.username };
+  const s = sessions.find((x) => x.token === token);
+  if (s) {
+    if (s.replaced) return { replaced: true };
+    return { username: s.username };
+  }
+  if (/^[0-9a-f]{48}$/i.test(token)) return null; // 旧版随机 token：会话文件即权威
+  return verifySessionToken(token);
 }
 
 function sendSessionReplaced(res) {
@@ -260,7 +306,11 @@ function sendSessionReplaced(res) {
 function checkAdmin(req) {
   const s = checkSession(req);
   if (!s || s.replaced) return s;
-  const user = findUser(s.username);
+  let user = findUser(s.username);
+  if (!user) {
+    const b = findBuiltin(s.username);
+    if (b) user = { username: b.username, name: b.name, role: b.role, status: 'enabled' };
+  }
   if (!user) return null;
   const role = user.role || 'member';
   if (!ADMIN_ROLES.includes(role)) return { forbidden: true };
@@ -419,7 +469,7 @@ const server = http.createServer(async (req, res) => {
       sendJson(res, 400, { ok: false, error: '密码长度需为 6-20 位' }); return;
     }
     const users = readJsonSafe(USERS_FILE, []);
-    if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) {
+    if (users.some((u) => u.username.toLowerCase() === username.toLowerCase()) || findBuiltin(username)) {
       sendJson(res, 409, { ok: false, error: '用户名已被注册' }); return;
     }
     const { salt, hash } = hashPassword(password);
@@ -437,9 +487,14 @@ const server = http.createServer(async (req, res) => {
     const password = String(body.password || '');
     const user = findUser(username);
     // OWASP: 失败提示不区分"用户不存在"与"密码错误"，防用户名枚举
-    if (!user || crypto.scryptSync(password, user.salt, 64).toString('hex') !== user.hash) {
-      sendJson(res, 401, { ok: false, error: '用户名或密码错误' }); return;
+    let authed = false;
+    if (user) {
+      authed = crypto.scryptSync(password, user.salt, 64).toString('hex') === user.hash;
+    } else {
+      const b = findBuiltin(username);
+      authed = Boolean(b && b.password === password);
     }
+    if (!authed) { sendJson(res, 401, { ok: false, error: '用户名或密码错误' }); return; }
     touchLastLogin(username);
     sendJson(res, 200, { ok: true, token: issueToken(username, 'web'), username });
     return;
@@ -447,11 +502,12 @@ const server = http.createServer(async (req, res) => {
 
   if (urlPath === '/api/auth/logout' && req.method === 'POST') {
     const h = req.headers['authorization'] || '';
-    const m = h.match(/^Bearer\s+([0-9a-f]{48})$/i);
+    const m = h.match(/^Bearer\s+(\S+)$/i);
     if (m) {
       const sessions = pruneSessions(readJsonSafe(SESSIONS_FILE, [])).filter((s) => s.token !== m[1]);
       writeJsonSafe(SESSIONS_FILE, sessions);
     }
+    // 签名 token 无状态，无法跨实例吊销；前端清除本地 token 即完成登出，余下等待自然过期
     sendJson(res, 200, { ok: true });
     return;
   }
@@ -543,11 +599,19 @@ const server = http.createServer(async (req, res) => {
     catch (e) { sendJson(res, 400, { ok: false, error: '请求体不是合法 JSON' }); return; }
     const username = String(body.username || '').trim();
     const password = String(body.password || '');
-    const user = findUser(username);
     // 与前台登录同口径：失败提示不区分用户不存在/密码错误
-    if (!user || crypto.scryptSync(password, user.salt, 64).toString('hex') !== user.hash) {
-      sendJson(res, 401, { ok: false, error: '用户名或密码错误' }); return;
+    let user = findUser(username);
+    let authed = false;
+    if (user) {
+      authed = crypto.scryptSync(password, user.salt, 64).toString('hex') === user.hash;
+    } else {
+      const b = findBuiltin(username);
+      if (b && b.password === password) {
+        authed = true;
+        user = { username: b.username, name: b.name, role: b.role, status: 'enabled' };
+      }
     }
+    if (!authed) { sendJson(res, 401, { ok: false, error: '用户名或密码错误' }); return; }
     if (user.status === 'disabled') { sendJson(res, 403, { ok: false, code: 'ACCOUNT_DISABLED', error: '账号已被禁用，请联系管理员' }); return; }
     const role = user.role || 'member';
     if (!ADMIN_ROLES.includes(role)) { sendJson(res, 403, { ok: false, code: 'NO_ADMIN_ROLE', error: '该账号无后台管理权限（前台注册用户请从主站登录）' }); return; }
