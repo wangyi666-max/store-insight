@@ -947,3 +947,30 @@ a { text-decoration: none; color: inherit; }
   border-radius: 6px; padding: 4px 10px; z-index: 5;
   box-shadow: 0 2px 8px rgba(18, 30, 22, .08);
 }
+
+/* ---------- V5 排版精修(视觉评审驱动) ---------- */
+
+/* 月度经营明细表:数字列右对齐便于比大小,首列月份/末列盈亏保持左对齐 */
+#operations-body .data-table th:nth-child(n+2):nth-child(-n+7),
+#operations-body .data-table td:nth-child(n+2):nth-child(-n+7) { text-align: right; }
+
+/* 问题详情键名列:宽度统一,纵向对齐 */
+.issue-dt-k { min-width: 56px; }
+
+/* 开发中弹窗:阴影减轻,贴合扁平语言 */
+.soon-modal { box-shadow: 0 2px 10px rgba(18, 30, 22, .10); }
+
+/* ---------- V5 间距节奏统一(实测驱动:板块间距 0/14/20 混乱、容器内出现 0 紧贴) ---------- */
+
+/* 板块间距统一 24px:padding 阻断尾部 margin 穿透 + 兄弟间距 20 */
+.view-anchor { padding-bottom: 4px; }
+.view-anchor + .view-anchor { margin-top: 20px; }
+
+/* 卡片流容器:统一 20px 纵向节奏,清掉子元素自带 margin 造成的 0/14/22 混乱 */
+#overview-body, #customer-body, #operations-body, #ugc-body,
+#issues-body, #actions-body, #compare-body { display: flex; flex-direction: column; gap: 20px; }
+#overview-body > *, #customer-body > *, #operations-body > *, #ugc-body > *,
+#issues-body > *, #actions-body > *, #compare-body > * { margin-top: 0 !important; margin-bottom: 0 !important; }
+
+/* KPI 数值层级略提 */
+.kpi-num { font-size: 22px; }
