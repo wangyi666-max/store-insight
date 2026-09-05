@@ -96,9 +96,14 @@ const MIME = {
   '.json': 'application/json; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.jpg': 'image/jpeg',
   '.ico': 'image/x-icon',
   '.md': 'text/markdown; charset=utf-8'
 };
+
+// 代码类文件 no-cache + Last-Modified 协商缓存：平台 CDN 默认缓存 30 天，
+// 不加缓存头时部署新版本用户端仍看到旧文件；图片类基本不变，缓存 1 天
+const STATIC_LONG_CACHE = { '.jpg': 1, '.png': 1, '.svg': 1, '.ico': 1 };
 
 function serveStatic(req, res, urlPath) {
   let rel = decodeURIComponent(urlPath.split('?')[0]);
@@ -108,10 +113,26 @@ function serveStatic(req, res, urlPath) {
   if (!filePath.startsWith(PUBLIC_DIR)) {
     res.writeHead(403); res.end('Forbidden'); return;
   }
-  fs.readFile(filePath, (err, buf) => {
-    if (err) { res.writeHead(404); res.end('Not Found'); return; }
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath)] || 'application/octet-stream' });
-    res.end(buf);
+  const ext = path.extname(filePath);
+  const headers = { 'Content-Type': MIME[ext] || 'application/octet-stream' };
+  if (STATIC_LONG_CACHE[ext]) {
+    headers['Cache-Control'] = 'public, max-age=86400';
+  } else {
+    headers['Cache-Control'] = 'no-cache';
+  }
+  fs.stat(filePath, (sErr, st) => {
+    if (sErr) { res.writeHead(404); res.end('Not Found'); return; }
+    if (!STATIC_LONG_CACHE[ext]) {
+      const mtimeSec = Math.floor(st.mtimeMs / 1000);
+      headers['Last-Modified'] = new Date(mtimeSec * 1000).toUTCString();
+      const ims = Date.parse(req.headers['if-modified-since'] || '') / 1000;
+      if (ims && ims >= mtimeSec) { res.writeHead(304, headers); res.end(); return; }
+    }
+    fs.readFile(filePath, (err, buf) => {
+      if (err) { res.writeHead(404); res.end('Not Found'); return; }
+      res.writeHead(200, headers);
+      res.end(buf);
+    });
   });
 }
 
