@@ -22,7 +22,6 @@
       <div class="sidebar-section">
         <div class="sidebar-title">当前门店</div>
         <div class="store-card">
-          <div class="store-district" id="sidebar-district">—</div>
           <div class="store-name" id="sidebar-store-name">—</div>
           <div class="sidebar-selects">
             <select id="sidebar-district-select" aria-label="切换商圈"></select>
@@ -38,13 +37,12 @@
           <a class="nav-item" href="#store" data-view="view-store"><span class="nav-num">02</span>选择门店</a>
           <a class="nav-item" href="#overview" data-view="view-overview"><span class="nav-num">03</span>经营状态</a>
           <a class="nav-item" href="#customer" data-view="view-customer"><span class="nav-num">04</span>客群分析</a>
-          <a class="nav-item" href="#product" data-view="view-product"><span class="nav-num">05</span>商品分析</a>
-          <a class="nav-item" href="#operations" data-view="view-operations"><span class="nav-num">06</span>经营数据</a>
-          <a class="nav-item" href="#ugc" data-view="view-ugc"><span class="nav-num">07</span>用户满意度</a>
-          <a class="nav-item" href="#issues" data-view="view-issues"><span class="nav-num">08</span>AI识别问题</a>
-          <a class="nav-item" href="#actions" data-view="view-actions"><span class="nav-num">09</span>行动建议</a>
-          <a class="nav-item" href="#report" data-view="view-report"><span class="nav-num">10</span>诊断报告</a>
-          <a class="nav-item" href="#compare" data-view="view-compare"><span class="nav-num">11</span>门店对比</a>
+          <a class="nav-item" href="#operations" data-view="view-operations"><span class="nav-num">05</span>经营数据</a>
+          <a class="nav-item" href="#ugc" data-view="view-ugc"><span class="nav-num">06</span>用户满意度</a>
+          <a class="nav-item" href="#issues" data-view="view-issues"><span class="nav-num">07</span>AI识别问题</a>
+          <a class="nav-item" href="#actions" data-view="view-actions"><span class="nav-num">08</span>行动建议</a>
+          <a class="nav-item" href="#report" data-view="view-report"><span class="nav-num">09</span>诊断报告</a>
+          <a class="nav-item" href="#compare" data-view="view-compare"><span class="nav-num">10</span>门店对比</a>
           <!-- 已下线(需求4/6)：库存分析、营销分析、问题优化排序 —— 入口移除，代码注释保留，
                待库存/营销数据接入后恢复。对应视图与加载器见下方注释块与 app.js COMMENTED_LOADERS。
           <a class="nav-item" href="#inventory" data-view="view-inventory"><span class="nav-num">--</span>库存分析</a>
@@ -140,17 +138,7 @@
         </div>
       </section>
 
-      <!-- 05 商品分析 -->
-      <section class="view-anchor" id="view-product">
-        <div class="view-inner">
-          <div class="view-head">
-            <div class="view-title">商品分析</div>
-          </div>
-          <div id="product-body"></div>
-        </div>
-      </section>
-
-      <!-- 06 经营数据 -->
+      <!-- 05 经营数据 -->
       <section class="view-anchor" id="view-operations">
         <div class="view-inner">
           <div class="view-head">
@@ -160,18 +148,17 @@
         </div>
       </section>
 
-      <!-- 07 用户满意度（主题分析 + 情感镜像，需求3） -->
+      <!-- 06 用户满意度（主题分析 + 情感镜像，需求3） -->
       <section class="view-anchor" id="view-ugc">
         <div class="view-inner">
           <div class="view-head">
             <div class="view-title">用户满意度</div>
-            <div class="view-sub" id="ugc-sub">主题分析 · 情感镜像 · 基于真实 UGC 语料的确定性统计</div>
           </div>
           <div id="ugc-body"></div>
         </div>
       </section>
 
-      <!-- 08 AI识别问题（仅客群类别，需求5） -->
+      <!-- 07 AI识别问题（仅客群类别，需求5） -->
       <section class="view-anchor" id="view-issues">
         <div class="view-inner">
           <div class="view-head">
@@ -181,7 +168,7 @@
         </div>
       </section>
 
-      <!-- 09 行动建议（与客群问题一一映射，需求7） -->
+      <!-- 08 行动建议（与客群问题一一映射，需求7） -->
       <section class="view-anchor" id="view-actions">
         <div class="view-inner">
           <div class="view-head">
@@ -191,12 +178,12 @@
         </div>
       </section>
 
-      <!-- 10 诊断报告（默认展示当前报告内容，需求8） -->
+      <!-- 09 诊断报告（默认展示当前报告内容，需求8） -->
       <section class="view-anchor" id="view-report">
         <div class="view-inner">
           <div class="view-head">
             <div class="view-title">诊断报告</div>
-            <div class="view-sub" id="report-sub">当前展示：默认报告（数据资产生成，非实时调用）</div>
+            <div class="view-sub" id="report-sub"></div>
           </div>
           <div class="report-actions">
             <button class="btn-primary" id="btn-export-txt" type="button">⬇ 生成诊断报告（下载 TXT）</button>
@@ -205,7 +192,7 @@
         </div>
       </section>
 
-      <!-- 11 门店对比（双店并排对照，数据来自默认报告数据集） -->
+      <!-- 10 门店对比（双店并排对照，数据来自默认报告数据集） -->
       <section class="view-anchor" id="view-compare">
         <div class="view-inner">
           <div class="view-head">

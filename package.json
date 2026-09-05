@@ -2,11 +2,12 @@
   "name": "store-insight-platform",
   "version": "1.0.0",
   "private": true,
-  "description": "智慧门店运营洞察平台 — 西安线下商业 AI 经营诊断(Web 前端 + 扣子工作流后端代理)",
+  "description": "智慧门店运营洞察平台 — 西安线下商业 AI 经营诊断（Web 前端 + 扣子工作流后端代理）",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
+    "dev": "node server.js",
     "start": "node server.js"
   }
 }

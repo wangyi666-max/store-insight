@@ -128,7 +128,6 @@
       rebuildStoreOptions(s, current.district);
       s.value = current.store;
     });
-    $('sidebar-district').textContent = current.district;
     $('sidebar-store-name').textContent = current.store;
     $('store-sub').textContent = '当前商圈「' + current.district + '」共 ' +
       API.state.meta.stores.filter(function (s) { return s.district === current.district; }).length + ' 家门店入库';
@@ -280,6 +279,60 @@
     $('btn-diagnose').addEventListener('click', startLiveDiagnosis);
     $('btn-logout').addEventListener('click', function () { API.logout(); });
     $('btn-export-txt').addEventListener('click', exportReportTxt);
+
+    // 问题卡折叠（容器常驻、innerHTML 重建，委托挂容器）
+    $('issues-body').addEventListener('click', function (e) {
+      if (e.target.closest('#btn-issue-expand')) {
+        $('issues-body').querySelectorAll('.issue-card').forEach(function (c) { toggleIssueCard(c, true); });
+        return;
+      }
+      if (e.target.closest('#btn-issue-collapse')) {
+        $('issues-body').querySelectorAll('.issue-card').forEach(function (c) { toggleIssueCard(c, false); });
+        return;
+      }
+      var head = e.target.closest('.issue-head');
+      if (head && head.parentElement.classList.contains('issue-card')) toggleIssueCard(head.parentElement);
+    });
+    $('issues-body').addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var head = e.target.closest('.issue-head');
+      if (head) { e.preventDefault(); toggleIssueCard(head.parentElement); }
+    });
+
+    // 行动建议 → 对应问题卡跳转（滚动 + 展开 + 短暂高亮）
+    $('actions-body').addEventListener('click', function (e) {
+      var j = e.target.closest('.action-jump');
+      if (!j) return;
+      e.preventDefault();
+      var idx = j.getAttribute('data-issue-idx');
+      var target = idx != null && idx !== '-1' ? $('issue-card-' + idx) : null;
+      (target || $('view-issues')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (target) {
+        toggleIssueCard(target, true);
+        target.classList.add('flash');
+        setTimeout(function () { target.classList.remove('flash'); }, 1600);
+      }
+    });
+
+    // 高峰时段「即将上线」点击弹窗（hover 提示走卡片 title 属性）
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('#peak-soon-card')) openSoonModal();
+    });
+  }
+
+  function openSoonModal() {
+    var mask = $('soon-modal');
+    if (mask) { mask.hidden = false; return; }
+    mask = document.createElement('div');
+    mask.className = 'soon-modal-mask';
+    mask.id = 'soon-modal';
+    mask.innerHTML = '<div class="soon-modal"><div class="soon-modal-title">功能开发中</div>' +
+      '<p>高峰时段分析正在开发中，上线后将提供分时段客流分布，辅助排班与备货决策。</p>' +
+      '<button type="button" class="btn-primary" id="soon-modal-ok">知道了</button></div>';
+    document.body.appendChild(mask);
+    mask.addEventListener('click', function (ev) {
+      if (ev.target === mask || ev.target.id === 'soon-modal-ok') mask.hidden = true;
+    });
   }
 
   /* ================= 全量渲染 ================= */
@@ -291,7 +344,6 @@
     renderStoreGrid();
     renderOverview();
     renderCustomer();
-    renderProduct();
     renderOperations();
     renderUgc();
     renderIssues();
@@ -327,8 +379,7 @@
       var isActive = s.name === current.store;
       return '<div class="store-card-item' + (isActive ? ' active' : '') + '" data-s="' + esc(s.name) + '">' +
         (isActive ? CHECK_SVG : '') +
-        '<div class="sc-name">' + esc(s.name) + '</div>' +
-        '<div class="sc-district">' + esc(s.district) + '</div></div>';
+        '<div class="sc-name">' + esc(s.name) + '</div></div>';
     }).join('');
     $('store-grid').querySelectorAll('.store-card-item').forEach(function (c) {
       c.addEventListener('click', function () { switchStore(c.getAttribute('data-s')); });
@@ -356,7 +407,7 @@
 
   function fourScoresHtml(four) {
     if (!four) return '';
-    return '<div class="card"><div class="card-title">四维评分<span class="card-tag">白盒公式 · 见报告数据说明</span></div>' +
+    return '<div class="card"><div class="card-title">四维评分</div>' +
       '<div class="four-grid">' + Object.keys(four).map(function (k) {
         var v = four[k];
         var color = v == null ? '#8a93a3' : v >= 75 ? '#166534' : v >= 55 ? '#e8734a' : '#c03d34';
@@ -370,16 +421,13 @@
     var d = D();
     if (!d) { $('overview-body').innerHTML = emptyStateHtml('暂无数据'); return; }
     var h = d.health || {};
-    $('overview-sub').textContent = (d.store ? d.store.name + ' · ' + d.store.district : '') +
-      (API.state.source === 'coze-live' ? ' · 实时诊断结果' : API.state.source === 'demo-cache' ? ' · 演示缓存（非实时调用）' : '') +
-      (isDefault() && d.core_metrics && d.core_metrics['数据期间'] ? ' · 数据期间 ' + d.core_metrics['数据期间'] : '');
+    $('overview-sub').textContent = API.state.source === 'coze-live' ? '实时诊断结果'
+      : API.state.source === 'demo-cache' ? '演示缓存（非实时调用）' : '';
 
     var html = '<div class="grid-2col">';
     html += '<div class="card health-card"><div class="card-title">综合健康度</div>' +
       '<div class="health-main"><span class="health-score">' + (h.score != null ? h.score : '—') + '</span>' +
       '<span class="health-grade">' + esc(h.grade || h.status || '') + '</span></div>' +
-      (h.basis ? '<div class="mini-note">' + esc(h.basis) + '</div>' : '') +
-      (h.mom_change ? '<div class="mini-note">' + esc(h.mom_change) + '</div>' : '') +
       (!isDefault() ? '<div class="mini-note">AI 工作流即时评估（口径：营收趋势40%+满意度25%+竞争力20%+效率15%），与默认报告的确定性公式口径不同，分数偏差属正常</div>' : '') + '</div>';
     if (d.four_scores) html += fourScoresHtml(d.four_scores);
     html += '</div>';
@@ -414,8 +462,8 @@
       : (d.operations && d.operations.revenue_trend ? d.operations.revenue_trend : []);
     if (trend.length) {
       var maxV = Math.max.apply(null, trend.map(function (t) { return t.value; }));
-      html += '<div class="card"><div class="card-title">月营业额走势<span class="card-tag">' +
-        (isDefault() ? '03 经营主表' : '实时契约返回') + '</span></div>' +
+      html += '<div class="card"><div class="card-title">月营业额走势' +
+        (isDefault() ? '' : '<span class="card-tag">实时契约返回</span>') + '</div>' +
         '<div class="chart-box" id="ov-rev-chart"></div></div>';
     }
     $('overview-body').innerHTML = html;
@@ -442,33 +490,36 @@
 
     if (isDefault()) {
       var tags = ci.tags_top5 || [];
-      html += '<div class="card"><div class="card-title">客群标签 TOP5<span class="card-tag">基于经营数据与真实UGC推断 · 已标注</span></div>';
+      html += '<div class="card"><div class="card-title">客群标签 TOP5</div>';
       if (tags.length) {
         html += tags.map(function (t, i) {
           var pctNum = API.parsePct(t.pct) || 0;
           return '<div class="tagbar-row"><span class="tagbar-rank">' + (i + 1) + '</span>' +
             '<div class="tagbar-main"><div class="tagbar-head"><b>' + esc(t.name) + '</b><span class="tagbar-pct">' + esc(t.pct) + '</span></div>' +
             '<div class="tb-track"><div class="tb-fill" style="width:' + pctNum + '%"></div></div>' +
-            '<div class="tagbar-desc">' + esc(t.desc) + ' <i>依据：' + esc(t.basis) + '</i></div></div></div>';
+            '<div class="tagbar-desc">' + esc(t.desc) + '</div></div></div>';
         }).join('');
       } else html += emptyStateHtml('客群标签缺数据');
       html += '</div>';
 
       var rt = ci.retention || {};
       html += '<div class="grid-2col">';
-      html += '<div class="card"><div class="card-title">复购率（真实记录）</div>' +
-        '<div class="health-main"><span class="health-score">' + (rt.repurchase_rate != null ? rt.repurchase_rate : '—') + '</span><span class="health-grade">%</span></div>' +
-        '<div class="mini-note">' + esc(rt.repurchase_basis || '') + '</div>' +
+      html += '<div class="card"><div class="card-title">复购率</div>' +
+        '<div class="health-main repurchase-main"><span class="health-score">' + (rt.repurchase_rate != null ? rt.repurchase_rate : '—') + '</span><span class="health-grade">%</span></div>' +
         '<div class="chart-box" id="cu-rep-chart"></div></div>';
-      html += '<div class="card"><div class="card-title">新老客结构<span class="card-tag">推断</span></div><div id="cu-newold"></div>' +
-        '<div class="mini-note">' + esc(rt.new_old && rt.new_old.basis ? rt.new_old.basis : '知识库未覆盖') + '</div></div>';
+      html += '<div class="card"><div class="card-title">新老客结构</div>' +
+        (rt.new_old
+          ? '<div class="donut-row"><div id="cu-newold"></div><ul class="donut-legend">' +
+            donutLegend([
+              { label: '老客', value: rt.new_old['老客%'], text: (rt.new_old['老客%'] != null ? rt.new_old['老客%'] + '%' : '—'), color: '#166534' },
+              { label: '新客', value: rt.new_old['新客%'], text: (rt.new_old['新客%'] != null ? rt.new_old['新客%'] + '%' : '—'), color: '#d3d8de' }
+            ]) + '</ul></div>'
+          : '<div id="cu-newold"></div>') + '</div>';
       html += '</div>';
       if (rt.retention_curve) {
-        html += '<div class="card"><div class="card-title">留存曲线<span class="card-tag">推断</span></div>' +
-          '<div class="chart-box" id="cu-curve-chart"></div>' +
-          '<div class="mini-note">' + esc(rt.retention_curve.basis) + '</div></div>';
+        html += '<div class="card"><div class="card-title">留存曲线</div>' +
+          '<div class="chart-box" id="cu-curve-chart"></div></div>';
       }
-      html += '<div class="card"><div class="mini-note">' + esc(rt.notes || '') + '</div></div>';
       body.innerHTML = html;
       if (rt.trend && rt.trend.length) {
         var maxR = Math.max.apply(null, rt.trend.map(function (t) { return t.rate || 0; }).concat([40]));
@@ -523,56 +574,7 @@
     }
   }
 
-  /* ---------- 05 商品分析 ---------- */
-
-  function renderProduct() {
-    var d = D();
-    var body = $('product-body');
-    if (!d) { body.innerHTML = emptyStateHtml('暂无数据'); return; }
-    var html = '';
-    if (isDefault()) {
-      var c = d.core_metrics || {};
-      html += '<div class="grid-2col"><div class="card"><div class="card-title">主推产品<span class="card-tag">03 主表真实记录</span></div>';
-      if (c['主推产品']) {
-        html += '<div class="product-hero"><div class="ph-name">' + esc(c['主推产品']) + '</div>' +
-          '<div class="ph-price">¥' + esc(String(c['主推产品价格'])) + '</div></div>' +
-          '<div class="mini-note">月度菜单结构、SKU 销售明细知识库未覆盖。</div>';
-      } else html += emptyStateHtml('主推产品缺数据');
-      html += '</div>';
-      html += '<div class="card"><div class="card-title">价格带分布</div>' +
-        emptyStateHtml('价格带分布缺数据（知识库未覆盖）', '补齐路径：菜单各 SKU 价格与销量结构入库后自动生成') + '</div>';
-      html += '</div>';
-    } else {
-      var pp = d.product_price || {};
-      var tops = pp.top_products || [];
-      html += '<div class="card"><div class="card-title">热销产品<span class="card-tag">契约返回</span></div>';
-      html += tops.length ? '<table class="data-table"><thead><tr><th>产品</th><th>价格</th><th>销售占比</th></tr></thead><tbody>' +
-        tops.map(function (t) {
-          return '<tr><td>' + esc(t.name) + '</td><td>¥' + esc(String(t.price)) + '</td><td>' + esc(t.sales_share) + '</td></tr>';
-        }).join('') + '</tbody></table>' : emptyStateHtml('热销产品缺数据');
-      html += '</div>';
-      var bands = pp.price_bands || [];
-      var bandInfer = bands.some(function (b) { return hasInfer(b.pct); });
-      html += '<div class="card"><div class="card-title">价格带分布' +
-        (bandInfer ? '<span class="card-tag">占比为契约标注"推断"</span>' : '') + '</div>';
-      html += bands.length ? bands.map(function (b) {
-        var pctNum = API.parsePct(b.pct) || 0;
-        return '<div class="tag-bar-row"><span class="tb-label">' + esc(b.band) + '</span>' +
-          '<div class="tb-track"><div class="tb-fill" style="width:' + pctNum + '%"></div></div>' +
-          '<span class="tb-value">' + esc(noInfer(b.pct)) + '</span></div>';
-      }).join('') : emptyStateHtml('价格带缺数据（契约返回为空，已如实展示）');
-      html += '</div>';
-      if ((pp.advantages || []).length || (pp.risks || []).length) {
-        html += '<div class="grid-2col"><div class="card"><div class="card-title">产品优势</div><ul class="plain-list">' +
-          (pp.advantages || []).map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ul></div>' +
-          '<div class="card"><div class="card-title">产品风险</div><ul class="plain-list">' +
-          (pp.risks || []).map(function (a) { return '<li>' + esc(a) + '</li>'; }).join('') + '</ul></div></div>';
-      }
-    }
-    body.innerHTML = html;
-  }
-
-  /* ---------- 06 经营数据 ---------- */
+  /* ---------- 05 经营数据 ---------- */
 
   function renderOperations() {
     var d = D();
@@ -582,7 +584,7 @@
     if (isDefault()) {
       var monthly = (d.operations && d.operations.monthly) || [];
       if (monthly.length) {
-        html += '<div class="card"><div class="card-title">月度经营明细<span class="card-tag">03 经营主表（依据真实锚点模拟）</span></div>' +
+        html += '<div class="card"><div class="card-title">月度经营明细</div>' +
           '<div class="table-wrap"><table class="data-table"><thead><tr>' +
           '<th>月份</th><th>月营业额</th><th>日均客流</th><th>客单价</th><th>复购率</th><th>毛利率</th><th>净利润</th><th>盈亏</th></tr></thead><tbody>' +
           monthly.map(function (m) {
@@ -605,8 +607,9 @@
             donutLegend(segs.map(function (s, i) {
               return { label: s.label, value: s.value, text: s.value + '%', color: CHANNEL_COLORS[i % CHANNEL_COLORS.length] };
             })) + '</ul></div></div>';
-          html += '<div class="card"><div class="card-title">高峰时段</div>' +
-            emptyStateHtml('分时段客流缺数据（知识库未覆盖）', '补齐路径：POS 分时段流水或客流计数器数据接入') + '</div></div>';
+          html += '<div class="card soon-card" id="peak-soon-card" data-tip="高峰时段分析开发中，即将上线">' +
+            '<div class="card-title">高峰时段<span class="soon-tag">即将上线</span></div>' +
+            '<div class="soon-body">分时段客流分析</div></div>';
         }
       } else {
         html += '<div class="card">' + emptyStateHtml('该门店暂无经营数据记录') + '</div>';
@@ -663,31 +666,29 @@
 
     if (isDefault() && ug.satisfaction) {
       var sat = ug.satisfaction;
-      $('ugc-sub').textContent = ug.basis || '';
       var segs = [
         { label: '好评', value: sat.pos, color: SENTI_COLORS.pos },
         { label: '中立', value: sat.neu, color: SENTI_COLORS.neu },
         { label: '差评', value: sat.neg, color: SENTI_COLORS.neg }
       ];
       html += '<div class="grid-2col">';
-      html += '<div class="card"><div class="card-title">满意度三模块分类<span class="card-tag">真实语料 n=' + sat.total + '</span></div>' +
+      html += '<div class="card"><div class="card-title">满意度三模块分类</div>' +
         '<div class="donut-row"><div id="ug-donut"></div><ul class="donut-legend">' + donutLegend(segs.map(function (s) {
           return { label: s.label, value: s.value, text: s.value + '%', color: s.color };
-        })) + '</ul></div>' +
-        '<div class="mini-note">' + esc(sat.method) + '</div></div>';
+        })) + '</ul></div></div>';
 
       var mir = ug.mirror || {};
-      html += '<div class="card"><div class="card-title">词级情感镜像<span class="card-tag">同一文本中的矛盾态度</span></div>' +
+      html += '<div class="card"><div class="card-title">词级情感镜像</div>' +
         '<div class="mirror-grid">' +
         '<div class="mirror-item"><div class="mirror-num" style="color:#166534">' + (mir.pos_with_concern_pct != null ? mir.pos_with_concern_pct + '%' : '—') + '</div>' +
-        '<div class="mirror-label">好评含隐忧</div><div class="mirror-n">' + (mir.pos_with_concern_n || 0) + ' 条好评同时命中负向词</div></div>' +
+        '<div class="mirror-label">好评含隐忧</div></div>' +
         '<div class="mirror-item"><div class="mirror-num" style="color:#c03d34">' + (mir.neg_with_praise_pct != null ? mir.neg_with_praise_pct + '%' : '—') + '</div>' +
-        '<div class="mirror-label">差评含认可</div><div class="mirror-n">' + (mir.neg_with_praise_n || 0) + ' 条差评同时命中正向词</div></div>' +
-        '</div><div class="mini-note">' + esc(mir.method || '') + '</div></div>';
+        '<div class="mirror-label">差评含认可</div></div>' +
+        '</div></div>';
       html += '</div>';
 
       if (ug.dianping && ug.dianping['评价总数']) {
-        html += '<div class="card"><div class="card-title">大众点评摘要<span class="card-tag">真实爬取</span></div><ul class="kv-list">' +
+        html += '<div class="card"><div class="card-title">大众点评摘要</div><ul class="kv-list">' +
           '<li><span>评价总数</span><b>' + esc(String(ug.dianping['评价总数'])) + ' 条</b></li>' +
           '<li><span>人均消费</span><b>¥' + esc(String(ug.dianping['人均消费'])) + '</b></li></ul></div>';
       }
@@ -695,7 +696,7 @@
       // 五大主题：雷达 + 明细 + 热力图
       var themes = ug.themes || [];
       if (themes.length) {
-        html += '<div class="grid-2col"><div class="card"><div class="card-title">五大主题维度雷达<span class="card-tag">主题好评率(0-100)</span></div>' +
+        html += '<div class="grid-2col"><div class="card"><div class="card-title">五大主题维度雷达</div>' +
           '<div id="ug-radar" class="radar-box"></div></div>';
         html += '<div class="card"><div class="card-title">主题明细</div><table class="data-table"><thead><tr>' +
           '<th>主题</th><th>好评率</th><th>好评</th><th>中立</th><th>差评</th><th>高频词</th></tr></thead><tbody>' +
@@ -705,22 +706,22 @@
               '<td class="kw-cell">' + esc((t.keywords || []).join(' / ')) + '</td></tr>';
           }).join('') + '</tbody></table></div></div>';
 
-        html += '<div class="card"><div class="card-title">主题 × 情感热力图<span class="card-tag">评论条数</span></div>' +
-          '<div class="heatmap" id="ug-heatmap"></div><div class="mini-note">颜色越深 = 该主题下对应情感的评论越多；好评用墨绿、差评用朱砂。</div></div>';
+        html += '<div class="card"><div class="card-title">主题 × 情感热力图</div>' +
+          '<div class="heatmap" id="ug-heatmap"></div></div>';
       }
 
       // 词云
       var wc = ug.wordcloud || { pos: [], neg: [] };
       if (wc.pos.length || wc.neg.length) {
         html += '<div class="grid-2col">' +
-          '<div class="card"><div class="card-title">好评关键词云<span class="card-tag">真实词频</span></div><div class="wordcloud" id="ug-wc-pos"></div></div>' +
-          '<div class="card"><div class="card-title">差评关键词云<span class="card-tag">真实词频</span></div><div class="wordcloud" id="ug-wc-neg"></div></div></div>';
+          '<div class="card"><div class="card-title">好评关键词云</div><div class="wordcloud" id="ug-wc-pos"></div></div>' +
+          '<div class="card"><div class="card-title">差评关键词云</div><div class="wordcloud" id="ug-wc-neg"></div></div></div>';
       }
 
       // 典型评论
       var tcs = ug.typical_comments || [];
       if (tcs.length) {
-        html += '<div class="card"><div class="card-title">典型评论<span class="card-tag">真实原文 · 已脱敏</span></div>' +
+        html += '<div class="card"><div class="card-title">典型评论</div>' +
           tcs.map(function (c) {
             var tagMap = { pos: ['好评', '#166534'], neu: ['中立', '#8a93a3'], neg: ['差评', '#c03d34'] };
             var tg = tagMap[c.sentiment] || tagMap.neu;
@@ -738,7 +739,6 @@
       renderWordcloud($('ug-wc-neg'), wc.neg, '#c03d34');
     } else {
       // 实时契约形态
-      $('ugc-sub').textContent = '实时诊断返回的口碑摘要';
       var score = ug.satisfaction_score;
       html += '<div class="grid-2col"><div class="card"><div class="card-title">满意度评分</div>' +
         '<div class="health-main"><span class="health-score">' + (score != null ? score : '—') + '</span></div>' +
@@ -813,18 +813,26 @@
     }).join('');
   }
 
-  /* ---------- 08 AI识别问题（仅客群类别） ---------- */
+  /* ---------- 07 AI识别问题（仅客群类别；扁平化卡片，证据/影响/置信度默认折叠） ---------- */
 
-  function issueCardHtml(p) {
-    var prCls = p.priority === 'P1' || p.priority === 'P0' ? 'pr-p1' : p.priority === 'P2' ? 'pr-p2' : 'pr-p3';
-    var kindTag = p.kind ? '<span class="kind-tag kind-' + esc(p.kind) + '">' + esc(p.kind) + '</span>' : '';
-    return '<div class="issue-card">' +
-      '<div class="issue-head"><span class="pr-badge ' + prCls + '">' + esc(p.priority || '—') + '</span>' + kindTag +
-      '<b class="issue-title">' + esc(p.title) + '</b></div>' +
-      (p.evidence ? '<div class="issue-row"><span class="issue-k">证据</span>' + esc(p.evidence) + '</div>' : '') +
-      (p.impact ? '<div class="issue-row"><span class="issue-k">影响</span>' + esc(p.impact) + '</div>' : '') +
-      (p.cause_chain ? '<div class="issue-row"><span class="issue-k">归因</span>' + esc(p.cause_chain) + '</div>' : '') +
-      (p.confidence ? '<div class="issue-conf">置信度：' + esc(p.confidence) + '</div>' : '') +
+  function prClass(priority) {
+    return priority === 'P1' || priority === 'P0' ? 'pr-p1' : priority === 'P2' ? 'pr-p2' : 'pr-p3';
+  }
+
+  function issueCardHtml(p, idx) {
+    var kindTag = p.kind ? '<span class="kind-tag">' + esc(p.kind) + '</span>' : '';
+    var rows = '';
+    if (p.evidence) rows += '<div class="issue-dt-row"><span class="issue-dt-k">证据</span><span class="issue-dt-v">' + esc(p.evidence) + '</span></div>';
+    if (p.impact) rows += '<div class="issue-dt-row"><span class="issue-dt-k">业务影响</span><span class="issue-dt-v">' + esc(p.impact) + '</span></div>';
+    if (p.cause_chain) rows += '<div class="issue-dt-row"><span class="issue-dt-k">归因</span><span class="issue-dt-v">' + esc(p.cause_chain) + '</span></div>';
+    if (p.confidence) rows += '<div class="issue-dt-row"><span class="issue-dt-k">置信度</span><span class="conf-chip">' + esc(p.confidence) + '</span></div>';
+    return '<div class="issue-card" id="issue-card-' + idx + '">' +
+      '<div class="issue-head" role="button" tabindex="0">' +
+      '<span class="pr-badge ' + prClass(p.priority) + '">' + esc(p.priority || '—') + '</span>' + kindTag +
+      '<b class="issue-title">' + esc(p.title) + '</b>' +
+      (rows ? '<span class="issue-toggle">详情 <i class="issue-arrow"></i></span>' : '') +
+      '</div>' +
+      (rows ? '<div class="issue-detail" hidden>' + rows + '</div>' : '') +
       '</div>';
   }
 
@@ -833,29 +841,46 @@
     return problems.filter(function (p) { return p.category === '客群'; });
   }
 
+  function sortedCustomerProblems(d) {
+    var list = customerProblems(d);
+    var order = { P0: 0, P1: 1, P2: 2, P3: 3 };
+    list.sort(function (a, b) { return (order[a.priority] != null ? order[a.priority] : 9) - (order[b.priority] != null ? order[b.priority] : 9); });
+    return list;
+  }
+
+  function toggleIssueCard(card, expand) {
+    var dt = card.querySelector('.issue-detail');
+    if (!dt) return;
+    var open = expand != null ? expand : dt.hidden;
+    dt.hidden = !open;
+    card.classList.toggle('open', open);
+  }
+
   function renderIssues() {
     var d = D();
     var body = $('issues-body');
     if (!d) { body.innerHTML = emptyStateHtml('暂无数据'); return; }
-    var list = customerProblems(d);
+    var list = sortedCustomerProblems(d);
     var html = '';
-    if (d.ai_diagnosis && d.ai_diagnosis.summary) {
-      html += '<div class="card"><div class="mini-note">' + esc(d.ai_diagnosis.summary) + '</div></div>';
-    }
     if (!list.length) {
       html += '<div class="card">' + emptyStateHtml('本次诊断未返回「客群」类别问题',
         isDefault() ? 'UGC 语料中未检出显著客群问题信号' : '按需求仅展示客群类别；其他类别问题不在本模块展示') + '</div>';
     } else {
-      var order = { P0: 0, P1: 1, P2: 2, P3: 3 };
-      list.sort(function (a, b) { return (order[a.priority] != null ? order[a.priority] : 9) - (order[b.priority] != null ? order[b.priority] : 9); });
-      html += '<div class="issue-stat">客群类问题 <b>' + list.length + '</b> 项 · 排序：差评 P1 ＞ 中性 P2 ＞ 需求 P3（' +
-        (isDefault() ? '基于真实 UGC 主题统计' : '实时契约返回') + '）</div>';
-      html += list.map(issueCardHtml).join('');
+      html += '<div class="issue-toolbar"><span class="issue-sort-note">客群类问题 <b>' + list.length + '</b> 项 · 排序：P1 差评优先 ＞ P2 中性 ＞ P3 需求</span>' +
+        '<span class="issue-bulk"><button type="button" class="btn-mini" id="btn-issue-expand">全部展开</button>' +
+        '<button type="button" class="btn-mini" id="btn-issue-collapse">全部收起</button></span></div>';
+      html += list.map(function (p, i) { return issueCardHtml(p, i); }).join('');
     }
     body.innerHTML = html;
   }
 
-  /* ---------- 09 行动建议（与客群问题一一映射） ---------- */
+  /* ---------- 08 行动建议（与客群问题一一映射；顶部跳转标签 + 步骤 + 横向 chips） ---------- */
+
+  function actionJumpHtml(issueTitle, issueIdx) {
+    if (!issueTitle) return '';
+    return '<a class="action-jump" href="#issues" data-issue-idx="' + issueIdx + '">' +
+      '🔗 对应AI问题：' + esc(issueTitle) + '</a>';
+  }
 
   function renderActions() {
     var d = D();
@@ -867,27 +892,31 @@
       if (!acts.length) {
         html += '<div class="card">' + emptyStateHtml('暂无行动建议', '客群问题清单为空时同步为空') + '</div>';
       } else {
+        var issues = sortedCustomerProblems(d);
         html += acts.map(function (a) {
-          var prCls = a.priority === 'P1' ? 'pr-p1' : a.priority === 'P2' ? 'pr-p2' : 'pr-p3';
+          var refIdx = -1;
+          for (var i = 0; i < issues.length; i++) { if (issues[i].title === a.issue_ref) { refIdx = i; break; } }
           return '<div class="action-card">' +
-            '<div class="action-head"><span class="pr-badge ' + prCls + '">' + esc(a.priority) + '</span><b>' + esc(a.title) + '</b></div>' +
-            '<div class="action-ref">对应问题：' + esc(a.issue_ref) + '</div>' +
+            actionJumpHtml(a.issue_ref, refIdx) +
+            '<div class="action-head"><span class="pr-badge ' + prClass(a.priority) + '">' + esc(a.priority) + '</span><b>' + esc(a.title) + '</b></div>' +
             '<ol class="action-steps">' + (a.steps || []).map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ol>' +
-            '<div class="action-meta"><span>预期效果：' + esc(a.expected) + '</span>' +
-            '<span>周期：' + esc(a.cycle) + '</span><span>难度：' + esc(a.difficulty) + '</span></div></div>';
+            '<div class="action-chips">' +
+            (a.expected ? '<span class="act-chip act-chip-effect">预期效果：' + esc(a.expected) + '</span>' : '') +
+            (a.cycle ? '<span class="act-chip">周期：' + esc(a.cycle) + '</span>' : '') +
+            (a.difficulty ? '<span class="act-chip">难度：' + esc(a.difficulty) + '</span>' : '') +
+            '</div></div>';
         }).join('');
       }
     } else {
-      var list = customerProblems(d);
+      var list = sortedCustomerProblems(d);
       var rows = [];
-      list.forEach(function (p) {
-        (p.suggestions || []).forEach(function (s) { rows.push({ issue: p.title, text: s, priority: p.priority }); });
+      list.forEach(function (p, i) {
+        (p.suggestions || []).forEach(function (s) { rows.push({ issue: p.title, text: s, priority: p.priority, idx: i }); });
       });
       html += rows.length
         ? rows.map(function (r) {
-            var prCls = r.priority === 'P1' || r.priority === 'P0' ? 'pr-p1' : r.priority === 'P2' ? 'pr-p2' : 'pr-p3';
-            return '<div class="action-card"><div class="action-head"><span class="pr-badge ' + prCls + '">' + esc(r.priority) + '</span><b>' + esc(r.text) + '</b></div>' +
-              '<div class="action-ref">对应问题：' + esc(r.issue) + '</div></div>';
+            return '<div class="action-card">' + actionJumpHtml(r.issue, r.idx) +
+              '<div class="action-head"><span class="pr-badge ' + prClass(r.priority) + '">' + esc(r.priority) + '</span><b>' + esc(r.text) + '</b></div></div>';
           }).join('')
         : '<div class="card">' + emptyStateHtml('实时契约未返回客群类行动建议') + '</div>';
     }
@@ -900,11 +929,11 @@
     var d = D();
     var body = $('report-body');
     if (!d) { body.innerHTML = emptyStateHtml('暂无数据'); return; }
-    $('report-sub').textContent = isDefault()
-      ? '当前展示：默认报告（非实时调用）· 生成时间 ' + (API.state.generatedAt || '—')
-      : (API.state.source === 'demo-cache'
-          ? '当前展示：演示缓存（非实时调用）'
-          : '当前展示：实时诊断报告（AI 工作流返回）');
+    $('report-sub').textContent = API.state.source === 'demo-cache'
+      ? '当前展示：演示缓存（非实时调用）'
+      : API.state.source === 'coze-live'
+          ? '当前展示：实时诊断报告（AI 工作流返回）'
+          : '';
     var html = '';
     if (isDefault()) {
       var rep = d.report || {};
@@ -926,24 +955,11 @@
         return '<li><b>' + esc(a.title) + '</b>（' + esc(a.priority) + ' · 周期 ' + esc(a.cycle) + ' · 难度 ' + esc(a.difficulty) + '）<br>' +
           '<span class="rp-evi">' + esc((a.steps || []).join('；')) + ' → 预期：' + esc(a.expected) + '</span></li>';
       }).join('') + '</ul>' : '<p class="rp-p">—</p>';
-      html += '<h3 class="rp-h">五、数据说明</h3>' + dataNotesHtml(d.data_notes);
       html += '</div>';
     } else {
       html += '<div class="report-paper">' + API.renderMarkdown(d.report_markdown || '') + '</div>';
-      html += '<div class="card"><div class="card-title">数据说明</div>' + dataNotesHtml(d.data_notes) + '</div>';
     }
     body.innerHTML = html;
-  }
-
-  function dataNotesHtml(notes) {
-    notes = notes || {};
-    return '<ul class="kv-list data-notes">' +
-      '<li><span>数据来源</span><b>' + esc((notes.sources || []).join('；') || '—') + '</b></li>' +
-      '<li><span>模拟/推断标注</span><b>' + (notes.simulated ? '含模拟与推断数据（逐处标注）' : '全部为真实记录') + '</b></li>' +
-      (notes.period ? '<li><span>数据期间</span><b>' + esc(notes.period) + '</b></li>' : '') +
-      (notes.scoring ? '<li><span>评分口径</span><b>' + esc(notes.scoring) + '</b></li>' : '') +
-      (notes.inference ? '<li><span>推断口径</span><b>' + esc(notes.inference) + '</b></li>' : '') +
-      '<li><span>缺失数据</span><b>' + esc((notes.missing || []).join('；') || '无') + '</b></li></ul>';
   }
 
   /* ---------- 11 门店对比（默认报告数据集，双店并排对照） ---------- */
@@ -958,8 +974,12 @@
     var names = meta.stores.map(function (s) { return s.name; });
     if (!cmp.touched || names.indexOf(cmp.a) < 0) cmp.a = current.store && names.indexOf(current.store) >= 0 ? current.store : names[0];
     if (!cmp.b || cmp.b === cmp.a || names.indexOf(cmp.b) < 0) {
-      cmp.b = names.filter(function (n) { return n !== cmp.a; })
-        .sort(function (x, y) { return scoreOf(names, meta, y) - scoreOf(names, meta, x); })[0] || '';
+      // 默认对照店：西塔老太太（同商圈、本店语料户）；不存在或撞 A 时退回同商圈优先
+      var PREFERRED_B = '西塔老太太泥炉烤肉(粉象公园店)';
+      cmp.b = names.indexOf(PREFERRED_B) >= 0 && PREFERRED_B !== cmp.a
+        ? PREFERRED_B
+        : names.filter(function (n) { return n !== cmp.a; })
+            .sort(function (x, y) { return scoreOf(names, meta, y) - scoreOf(names, meta, x); })[0] || '';
     }
     function scoreOf(_n, _m, name) {
       var s = _m.stores.find(function (t) { return t.name === name; });
@@ -1058,9 +1078,8 @@
     var typeA = (a.store && a.store.type) || '', typeB = (b.store && b.store.type) || '';
     var cmpNotes = [];
     if (periodA && periodB && periodA !== periodB) cmpNotes.push('两店数据期间不同（' + periodA + ' vs ' + periodB + '），指标为各自最近可得月份的记录值');
-    if (typeA !== typeB) cmpNotes.push('跨业态对照（' + (typeA || '—') + ' vs ' + (typeB || '—') + '），指标含义随业态不同，仅供参考');
     if (/酒店/.test(typeA + typeB)) cmpNotes.push('酒店业态口径：日均客流=间夜数、客单价=ADR');
-    html += '<div class="card"><div class="card-title">核心指标对照<span class="card-tag">墨绿点 = 该项较优</span></div>' +
+    html += '<div class="card"><div class="card-title">核心指标对照</div>' +
       '<table class="data-table cmp-table"><thead><tr><th>指标</th><th>' + esc(nameA) + (periodA ? '<br><span class="cmp-period">' + esc(periodA) + '</span>' : '') + '</th><th>' + esc(nameB) + (periodB ? '<br><span class="cmp-period">' + esc(periodB) + '</span>' : '') + '</th></tr></thead><tbody>' +
       METRICS.map(function (m) {
         var va = ca[m[0]], vb = cb[m[0]];
@@ -1099,7 +1118,7 @@
     } else if (noteA !== noteB || noteA !== '本店真实评论语料') {
       satNote = '两店语料口径已逐店标注；参照语料反映商圈整体口碑，非该店直接评价，对比时请留意。';
     }
-    html += '<div class="card"><div class="card-title">满意度对照<span class="card-tag">真实 UGC 确定性统计</span></div>' +
+    html += '<div class="card"><div class="card-title">满意度对照</div>' +
       '<div class="cmp-sat">' + satSide(a) + satSide(b) + '</div>' +
       (satNote ? '<div class="mini-note">' + esc(satNote) + '</div>' : '') +
       '</div>';
@@ -1136,18 +1155,9 @@
         (a.steps || []).forEach(function (s, j) { lines.push('     措施' + (j + 1) + '：' + s); });
         lines.push('     预期效果：' + a.expected);
       });
-      lines.push('', '五、数据说明', '');
-      var n = d.data_notes || {};
-      lines.push('  数据来源：' + (n.sources || []).join('；'));
-      lines.push('  模拟/推断标注：' + (n.simulated ? '含模拟与推断数据（逐处标注）' : '全部为真实记录'));
-      lines.push('  缺失数据：' + (n.missing || []).join('；'));
     } else {
       var md = (d.report_markdown || '').replace(/\*\*/g, '').replace(/^#{1,4}\s+/gm, '');
       lines.push(md);
-      var n2 = d.data_notes || {};
-      lines.push('', '— 数据说明 —');
-      lines.push('数据来源：' + (n2.sources || []).join('；'));
-      lines.push('缺失数据：' + (n2.missing || []).join('；'));
     }
     var fname = '智慧门店诊断报告_' + storeName.replace(/[\\/:*?"<>|\s]+/g, '_') + '_' +
       new Date().toISOString().slice(0, 10) + '.txt';
