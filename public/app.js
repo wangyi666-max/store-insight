@@ -775,7 +775,7 @@
 
   function drawRadar(container, themes) {
     if (!container) return;
-    var size = 300, cx = size / 2, cy = size / 2 + 6, R = 100;
+    var vw = 400, vh = 300, cx = vw / 2, cy = vh / 2 + 6, R = 95;
     var n = themes.length;
     function pt(i, r) {
       var a = -Math.PI / 2 + i * 2 * Math.PI / n;
@@ -795,13 +795,13 @@
       return '<text class="radar-tick" x="' + (p.x + 5) + '" y="' + (p.y + 3) + '">' + Math.round(f * 100) + '</text>';
     }).join('');
     var labels = themes.map(function (t, i) {
-      var p = pt(i, R + 26);
+      var p = pt(i, R + 23);
       var anchor = Math.abs(p.x - cx) < 20 ? 'middle' : (p.x > cx ? 'start' : 'end');
       var low = t.score != null && t.score <= 30 ? ' axis-low' : '';
       return '<text class="axis-text' + low + '" x="' + p.x + '" y="' + p.y + '" text-anchor="' + anchor + '">' + esc(t.name) +
         ' ' + (t.score != null ? t.score : '—') + '</text>';
     }).join('');
-    container.innerHTML = '<svg viewBox="0 0 ' + size + ' ' + size + '" class="radar-svg">' +
+    container.innerHTML = '<svg viewBox="0 0 ' + vw + ' ' + vh + '" class="radar-svg">' +
       rings + axes +
       '<polygon points="' + vals + '" fill="rgba(22,101,52,0.18)" stroke="#166534" stroke-width="2"/>' + ticks + labels + '</svg>';
   }
