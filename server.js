@@ -60,9 +60,10 @@ function loadEnv() {
   return env;
 }
 const ENV = loadEnv();
-const COZE_PAT = process.env.COZE_PAT || ENV.COZE_PAT || '';
-const WORKFLOW_ID = process.env.COZE_WORKFLOW_ID || ENV.COZE_WORKFLOW_ID || '';
-const COZE_API_BASE = (process.env.COZE_API_BASE || ENV.COZE_API_BASE || 'https://api.coze.cn').replace(/\/+$/, '');
+// 部署平台禁止 COZE_ 前缀的用户变量,优先读 WORKFLOW_PAT/WORKFLOW_ID/API_BASE;本地 .env 老名继续可用
+const COZE_PAT = process.env.WORKFLOW_PAT || process.env.COZE_PAT || ENV.COZE_PAT || '';
+const WORKFLOW_ID = process.env.WORKFLOW_ID || process.env.COZE_WORKFLOW_ID || ENV.COZE_WORKFLOW_ID || '';
+const COZE_API_BASE = (process.env.API_BASE || process.env.COZE_API_BASE || ENV.COZE_API_BASE || 'https://api.coze.cn').replace(/\/+$/, '');
 
 const PORT = Number(process.env.PORT) || 5000;
 const HOST = '0.0.0.0';
