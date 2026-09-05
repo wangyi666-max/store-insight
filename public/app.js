@@ -129,8 +129,6 @@
       s.value = current.store;
     });
     $('sidebar-store-name').textContent = current.store;
-    $('store-sub').textContent = '当前商圈「' + current.district + '」共 ' +
-      API.state.meta.stores.filter(function (s) { return s.district === current.district; }).length + ' 家门店入库';
   }
 
   function switchDistrict(name) {
